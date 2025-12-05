@@ -110,16 +110,20 @@ export default function UploadNotaPage() {
       // TODO: Implement /api/transactions endpoint
       alert("Fitur ini belum tersedia");
       return;
-      // const response = await fetch("/api/transactions", { method: "POST", body: JSON.stringify({
-        ...formData,
-        amount: parseFloat(formData.amount),
-        paymentMethod: formData.paymentMethod,
-        noteUrl,
-      });
-
-      console.log("Transaction created:", response.data);
-      alert("Transaksi berhasil dibuat!");
-      router.push("/dashboard/transactions");
+      
+      // const response = await fetch("/api/transactions", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     ...formData,
+      //     amount: parseFloat(formData.amount),
+      //     paymentMethod: formData.paymentMethod,
+      //     noteUrl,
+      //   }),
+      // });
+      // console.log("Transaction created");
+      // alert("Transaksi berhasil dibuat!");
+      // router.push("/dashboard/transactions");
     } catch (error: any) {
       console.error("Error:", error);
       console.error("Error response:", error.response?.data);
