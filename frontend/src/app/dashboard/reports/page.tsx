@@ -129,20 +129,17 @@ export default function ReportsPage() {
       // TODO: Implement /api/reports/export/pdf endpoint
       alert("Export PDF belum tersedia");
       return;
+      
       // const response = await fetch(`/api/reports/export/pdf?${params.toString()}`);
-
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `laporan_keuangan_${new Date().getTime()}.pdf`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      // const blob = await response.blob();
+      // const url = window.URL.createObjectURL(blob);
+      // const link = document.createElement("a");
+      // link.href = url;
+      // link.setAttribute("download", `laporan_keuangan_${new Date().getTime()}.pdf`);
+      // document.body.appendChild(link);
+      // link.click();
+      // link.remove();
+      // window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting PDF:", error);
       alert("Gagal export PDF");
@@ -164,20 +161,17 @@ export default function ReportsPage() {
       // TODO: Implement /api/reports/export/excel endpoint
       alert("Export Excel belum tersedia");
       return;
+      
       // const response = await fetch(`/api/reports/export/excel?${params.toString()}`);
-
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `laporan_keuangan_${new Date().getTime()}.xlsx`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      // const blob = await response.blob();
+      // const url = window.URL.createObjectURL(blob);
+      // const link = document.createElement("a");
+      // link.href = url;
+      // link.setAttribute("download", `laporan_keuangan_${new Date().getTime()}.xlsx`);
+      // document.body.appendChild(link);
+      // link.click();
+      // link.remove();
+      // window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting Excel:", error);
       alert("Gagal export Excel");
