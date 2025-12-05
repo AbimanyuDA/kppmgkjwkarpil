@@ -95,9 +95,11 @@ export default function UploadNotaPage() {
         // TODO: Implement /api/upload endpoint for file upload
         alert("Upload file belum tersedia");
         return;
+        
         // const uploadRes = await fetch("/api/upload", { method: "POST", body: fileFormData });
-        console.log("Upload response:", uploadRes.data);
-        noteUrl = uploadRes.data.data.url;
+        // const uploadJson = await uploadRes.json();
+        // console.log("Upload response:", uploadJson);
+        // noteUrl = uploadJson.data?.url || "";
       }
 
       // Create transaction
