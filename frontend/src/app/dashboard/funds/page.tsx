@@ -19,10 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
+// ...existing code...
 import { Plus, RefreshCcw } from "lucide-react";
 
 interface Fund {
+  // ...existing code...
   id: string;
   name: string;
   description: string;
@@ -45,8 +46,9 @@ export default function FundsPage() {
   const loadFunds = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/funds");
-      setFunds(res.data.data || []);
+      const res = await fetch("/api/funds");
+      const json = await res.json();
+      setFunds(json.data || []);
     } catch (err) {
       console.error("Failed to load funds", err);
       alert("Gagal memuat fund");
@@ -70,22 +72,23 @@ export default function FundsPage() {
     setSaving(true);
     try {
       if (form.id) {
-        await api.put(`/funds/${form.id}`, {
-          name: form.name,
-          description: form.description,
-          status: form.status,
+        await fetch("/api/funds", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: form.id, name: form.name, description: form.description, status: form.status }),
         });
       } else {
-        await api.post("/funds", {
-          name: form.name,
-          description: form.description,
+        await fetch("/api/funds", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: form.name, description: form.description }),
         });
       }
       resetForm();
       loadFunds();
     } catch (err: any) {
       console.error("Save fund error", err);
-      alert(err.response?.data?.error || "Gagal menyimpan fund");
+      alert("Gagal menyimpan fund");
     } finally {
       setSaving(false);
     }
@@ -103,11 +106,15 @@ export default function FundsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Hapus fund ini?")) return;
     try {
-      await api.delete(`/funds/${id}`);
+      await fetch("/api/funds", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
       loadFunds();
     } catch (err: any) {
       console.error("Delete fund error", err);
-      alert(err.response?.data?.error || "Gagal hapus fund");
+      alert("Gagal hapus fund");
     }
   };
 

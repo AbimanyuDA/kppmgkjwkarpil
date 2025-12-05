@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Plus, Save, X } from "lucide-react";
-import api from "@/lib/api";
+// ...existing code...
 
 type Category = {
   id: string;
@@ -41,8 +41,9 @@ export default function CategoriesPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get("/categories");
-      const data: Category[] = res.data.data || [];
+      const res = await fetch("/api/categories");
+      const json = await res.json();
+      const data: Category[] = json.data || [];
       setCategories(data.sort((a, b) => a.name.localeCompare(b.name)));
     } catch (err: any) {
       console.error("Failed to load categories", err);
@@ -63,7 +64,11 @@ export default function CategoriesPage() {
     const name = newCategory.trim();
     if (!name) return alert("Kategori tidak boleh kosong");
     try {
-      await api.post("/categories", { name });
+      await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
       setNewCategory("");
       fetchCategories();
     } catch (err: any) {
@@ -74,7 +79,11 @@ export default function CategoriesPage() {
   const deleteCategory = async (id: string) => {
     if (!confirm("Yakin ingin menghapus kategori ini?")) return;
     try {
-      await api.delete(`/categories/${id}`);
+      await fetch("/api/categories", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
       fetchCategories();
     } catch (err: any) {
       alert(err.response?.data?.error || "Gagal menghapus kategori");
@@ -90,7 +99,11 @@ export default function CategoriesPage() {
     const name = editing.value.trim();
     if (!name) return alert("Nama kategori tidak boleh kosong");
     try {
-      await api.put(`/categories/${editing.id}`, { name });
+      await fetch("/api/categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editing.id, name }),
+      });
       setEditing(null);
       fetchCategories();
     } catch (err: any) {

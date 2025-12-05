@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import api from "@/lib/api";
+import { loginApi } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,20 +27,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      console.log("Attempting login...");
-      const response = await api.post("/auth/login", { email, password });
-      console.log("Login response:", response.data);
-
-      const { token, user } = response.data.data;
-
+      const response = await loginApi(email, password);
+      const { token, user } = response.data;
       if (!token || !user) {
         throw new Error("Invalid response format");
       }
-
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      console.log("Login successful, redirecting...");
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Login error:", err);

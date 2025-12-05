@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
+// ...existing code...
 import { DollarSign } from "lucide-react";
 
 type Category = {
@@ -48,11 +48,12 @@ export default function IncomePage() {
     const fetchData = async () => {
       try {
         const [fundRes, categoryRes] = await Promise.all([
-          api.get("/funds"),
-          api.get("/categories"),
+          fetch("/api/funds"),
+          fetch("/api/categories"),
         ]);
-
-        const fundList = fundRes.data.data || [];
+        const fundJson = await fundRes.json();
+        const categoryJson = await categoryRes.json();
+        const fundList = fundJson.data || [];
         setFunds(fundList);
         if (fundList.length > 0) {
           setFormData((prev) => ({
@@ -60,8 +61,7 @@ export default function IncomePage() {
             fundId: prev.fundId || fundList[0].id,
           }));
         }
-
-        const catList: Category[] = categoryRes.data.data || [];
+        const catList: Category[] = categoryJson.data || [];
         setCategories(catList);
         if (catList.length > 0) {
           setFormData((prev) => ({
@@ -87,14 +87,16 @@ export default function IncomePage() {
         amount: parseFloat(formData.amount),
       });
 
-      const response = await api.post("/transactions", {
-        ...formData,
-        amount: parseFloat(formData.amount),
-        paymentMethod: formData.paymentMethod,
-        noteUrl: "",
+      await fetch("/api/income", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          amount: parseFloat(formData.amount),
+          paymentMethod: formData.paymentMethod,
+          noteUrl: "",
+        }),
       });
-
-      console.log("Income created:", response.data);
       alert("Pemasukan berhasil dicatat!");
       router.push("/dashboard/transactions");
     } catch (error: any) {

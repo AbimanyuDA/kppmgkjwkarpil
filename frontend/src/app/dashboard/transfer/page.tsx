@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeftRight, ArrowRight } from "lucide-react";
-import api from "@/lib/api";
+// ...existing code...
 
 export default function TransferPage() {
   const router = useRouter();
@@ -39,12 +39,13 @@ export default function TransferPage() {
   useEffect(() => {
     const fetchFunds = async () => {
       try {
-        const res = await api.get("/funds");
-        setFunds(res.data.data || []);
-        if ((res.data.data || []).length > 0) {
+        const res = await fetch("/api/funds");
+        const json = await res.json();
+        setFunds(json.data || []);
+        if ((json.data || []).length > 0) {
           setFormData((prev) => ({
             ...prev,
-            fundId: prev.fundId || res.data.data[0].id,
+            fundId: prev.fundId || json.data[0].id,
           }));
         }
       } catch (err) {
@@ -90,29 +91,35 @@ export default function TransferPage() {
         }`;
 
       // Transaksi 1: Pengeluaran dari sumber
-      await api.post("/transactions", {
-        type: "expense",
-        amount: amount,
-        category: "Transfer",
-        description: `${description} (Pengeluaran)`,
-        eventName: "Transfer Saldo",
-        date: formData.date,
-        fundId: formData.fundId,
-        paymentMethod: formData.fromMethod,
-        noteUrl: "",
+      await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "expense",
+          amount: amount,
+          category: "Transfer",
+          description: `${description} (Pengeluaran)`,
+          eventName: "Transfer Saldo",
+          date: formData.date,
+          fundId: formData.fundId,
+          paymentMethod: formData.fromMethod,
+          noteUrl: "",
+        }),
       });
-
-      // Transaksi 2: Pemasukan ke tujuan
-      await api.post("/transactions", {
-        type: "income",
-        amount: amount,
-        category: "Transfer",
-        description: `${description} (Pemasukan)`,
-        eventName: "Transfer Saldo",
-        date: formData.date,
-        fundId: formData.fundId,
-        paymentMethod: formData.toMethod,
-        noteUrl: "",
+      await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "income",
+          amount: amount,
+          category: "Transfer",
+          description: `${description} (Pemasukan)`,
+          eventName: "Transfer Saldo",
+          date: formData.date,
+          fundId: formData.fundId,
+          paymentMethod: formData.toMethod,
+          noteUrl: "",
+        }),
       });
 
       alert("Transfer berhasil!");

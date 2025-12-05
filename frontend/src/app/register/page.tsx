@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
+// ...existing code...
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -37,11 +37,10 @@ export default function RegisterPage() {
     setSuccess("");
 
     try {
-      const response = await api.post("/auth/register", {
-        name,
-        email,
-        password,
-        role,
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       setSuccess(`User ${email} berhasil dibuat! Silakan login.`);
