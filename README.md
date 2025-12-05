@@ -2,6 +2,44 @@
 
 Sistem pelaporan keuangan modern untuk bendahara GKJW Karangpilang yang memudahkan pencatatan pemasukan-pengeluaran, mengelola cashflow, dan mengumpulkan nota pembelian dari anak-anak persekutuan.
 
+## 🚀 Cara Menjalankan Aplikasi
+
+### **Opsi 1: Menggunakan Script Otomatis (Termudah)**
+
+```powershell
+# Di root folder project
+.\start.ps1
+```
+
+Script ini akan membuka 2 terminal baru:
+
+- Terminal 1: Backend (Golang) di `http://localhost:8080`
+- Terminal 2: Frontend (Next.js) di `http://localhost:3002`
+
+### **Opsi 2: Manual dengan 2 Terminal**
+
+**Terminal 1 - Backend:**
+
+```powershell
+cd backend
+go run main.go
+```
+
+**Terminal 2 - Frontend:**
+
+```powershell
+cd frontend
+npm run dev
+```
+
+### **Opsi 3: Menggunakan 1 Command (Background)**
+
+```powershell
+cd backend; Start-Job -ScriptBlock { go run main.go }; cd ..\frontend; npm run dev
+```
+
+---
+
 ## 🎯 Fitur Utama
 
 - ✅ **Dashboard Keuangan Lengkap** - Grafik pemasukan vs pengeluaran, saldo real-time
@@ -16,6 +54,7 @@ Sistem pelaporan keuangan modern untuk bendahara GKJW Karangpilang yang memudahk
 ## 🏗️ Tech Stack
 
 ### Frontend
+
 - **Next.js 14** (App Router)
 - **TypeScript**
 - **TailwindCSS**
@@ -23,12 +62,14 @@ Sistem pelaporan keuangan modern untuk bendahara GKJW Karangpilang yang memudahk
 - **Recharts** (untuk grafik)
 
 ### Backend
+
 - **Golang** (Gin Framework)
 - **PostgreSQL**
 - **GORM** (ORM)
 - **JWT** (Authentication)
 
 ### Storage
+
 - Firebase Storage / AWS S3 (untuk upload nota)
 
 ## 📁 Struktur Proyek
@@ -157,11 +198,13 @@ Frontend akan berjalan di `http://localhost:3000`
 Setelah menjalankan migration, akan ada 2 user default:
 
 ### Admin
+
 - Email: `admin@gkjw.com`
 - Password: `admin123`
 - Role: admin
 
 ### Member
+
 - Email: `member@gkjw.com`
 - Password: `member123`
 - Role: member
@@ -169,6 +212,7 @@ Setelah menjalankan migration, akan ada 2 user default:
 ## 📚 User Roles
 
 ### 🔴 Admin (Bendahara)
+
 - Full access ke semua fitur
 - Approve/reject transaksi
 - Generate laporan bulanan
@@ -177,18 +221,21 @@ Setelah menjalankan migration, akan ada 2 user default:
 - Lihat activity logs
 
 ### 🟡 Member (Anggota Pelaksana)
+
 - Input pengeluaran
 - Upload foto nota
 - Lihat status pengajuan
 - Lihat transaksi sendiri
 
 ### 🟢 Viewer (Koordinator/Pendeta)
+
 - Lihat laporan keuangan
 - Read-only access
 
 ## 🎨 Desain UI
 
 Sistem menggunakan desain modern dengan:
+
 - **Warna Utama**: Biru Navy (#1e3a8a) & Emas (#fbbf24)
 - **Sidebar**: Minimalis dengan icons
 - **Topbar**: Clean dan informatif
@@ -269,17 +316,20 @@ npm start
 ### Rekomendasi Deployment
 
 #### Frontend
+
 - **Vercel** (Recommended untuk Next.js)
 - Netlify
 - AWS Amplify
 
 #### Backend
+
 - **Railway** / Render (Easy deployment)
 - DigitalOcean App Platform
 - AWS EC2 / Google Cloud Run
 - Docker Container
 
 #### Database
+
 - **Supabase** (PostgreSQL managed)
 - AWS RDS
 - DigitalOcean Managed Database
@@ -310,6 +360,7 @@ CMD ["npm", "start"]
 ## 🔧 Environment Variables
 
 ### Backend (.env)
+
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -321,6 +372,7 @@ PORT=8080
 ```
 
 ### Frontend (.env.local)
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080/api
 NEXT_PUBLIC_APP_NAME=GKJW Finance System
@@ -329,6 +381,7 @@ NEXT_PUBLIC_APP_NAME=GKJW Finance System
 ## 📝 Database Schema
 
 ### Users
+
 - id (UUID)
 - name
 - email
@@ -337,6 +390,7 @@ NEXT_PUBLIC_APP_NAME=GKJW Finance System
 - created_at, updated_at
 
 ### Transactions
+
 - id (UUID)
 - type (income/expense)
 - amount
@@ -351,6 +405,7 @@ NEXT_PUBLIC_APP_NAME=GKJW Finance System
 - created_at, updated_at
 
 ### Activity Logs
+
 - id (UUID)
 - user_id (FK to users)
 - action
@@ -371,6 +426,7 @@ MIT License - feel free to use this project for your organization
 ## 👨‍💻 Support
 
 Untuk bantuan atau pertanyaan:
+
 - Email: support@gkjw.com
 - GitHub Issues: [Create an issue](link)
 

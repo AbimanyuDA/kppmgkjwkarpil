@@ -1,45 +1,65 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import api from '@/lib/api'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import api from "@/lib/api";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await api.post('/auth/login', { email, password })
-      const { token, user } = response.data.data
+      console.log("Attempting login...");
+      const response = await api.post("/auth/login", { email, password });
+      console.log("Login response:", response.data);
 
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
+      const { token, user } = response.data.data;
 
-      router.push('/dashboard')
+      if (!token || !user) {
+        throw new Error("Invalid response format");
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      console.log("Login successful, redirecting...");
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login gagal')
-    } finally {
-      setLoading(false)
+      console.error("Login error:", err);
+      const errorMessage =
+        err.response?.data?.error ||
+        err.message ||
+        "Login gagal. Silakan coba lagi.";
+      setError(errorMessage);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700">
       <div className="w-full max-w-md p-6">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">GKJW Karangpilang</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            GKJW Karangpilang
+          </h1>
           <p className="text-blue-200">Sistem Pelaporan Keuangan</p>
         </div>
 
@@ -81,12 +101,12 @@ export default function LoginPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Memproses...' : 'Login'}
+                {loading ? "Memproses..." : "Login"}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

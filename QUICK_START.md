@@ -3,6 +3,7 @@
 ## Installation Steps
 
 ### 1. Backend Setup
+
 ```bash
 cd backend
 go mod download
@@ -12,6 +13,7 @@ go run main.go
 ```
 
 ### 2. Database Setup
+
 ```bash
 # Create database
 createdb gkjw_finance
@@ -21,6 +23,7 @@ psql -d gkjw_finance -f migrations/001_init.sql
 ```
 
 ### 3. Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -31,10 +34,12 @@ npm run dev
 ## Default Login
 
 **Admin:**
+
 - Email: admin@gkjw.com
 - Password: admin123
 
 **Member:**
+
 - Email: member@gkjw.com
 - Password: member123
 

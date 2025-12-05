@@ -21,6 +21,19 @@ func SetupRoutes(router *gin.Engine) {
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
 		{
+			// Categories
+			categories := protected.Group("/categories")
+			{
+				categories.GET("", handlers.GetCategories)
+				adminCategories := categories.Group("")
+				adminCategories.Use(middleware.AdminOnly())
+				{
+					adminCategories.POST("", handlers.CreateCategory)
+					adminCategories.PUT(":id", handlers.UpdateCategory)
+					adminCategories.DELETE(":id", handlers.DeleteCategory)
+				}
+			}
+
 			// Dashboard
 			dashboard := protected.Group("/dashboard")
 			{
@@ -57,6 +70,20 @@ func SetupRoutes(router *gin.Engine) {
 				users.POST("", handlers.CreateUser)
 				users.PUT("/:id", handlers.UpdateUser)
 				users.DELETE("/:id", handlers.DeleteUser)
+			}
+
+
+			// Funds: list for all, manage for admin
+			funds := protected.Group("/funds")
+			{
+				funds.GET("", handlers.GetFunds)
+				fundsAdmin := funds.Group("")
+				fundsAdmin.Use(middleware.AdminOnly())
+				{
+					fundsAdmin.POST("", handlers.CreateFund)
+					fundsAdmin.PUT("/:id", handlers.UpdateFund)
+					fundsAdmin.DELETE("/:id", handlers.DeleteFund)
+				}
 			}
 
 			// Activity Logs

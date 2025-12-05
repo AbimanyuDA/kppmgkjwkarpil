@@ -5,6 +5,7 @@ Base URL: `http://localhost:8080/api`
 ## Authentication
 
 All protected endpoints require a JWT token in the Authorization header:
+
 ```
 Authorization: Bearer <token>
 ```
@@ -14,9 +15,11 @@ Authorization: Bearer <token>
 ## 🔐 Auth Endpoints
 
 ### 1. Login
+
 **POST** `/auth/login`
 
 **Request Body:**
+
 ```json
 {
   "email": "admin@gkjw.com",
@@ -25,6 +28,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "data": {
@@ -41,9 +45,11 @@ Authorization: Bearer <token>
 ```
 
 ### 2. Register
+
 **POST** `/auth/register`
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe",
@@ -54,6 +60,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "message": "User registered successfully",
@@ -71,9 +78,11 @@ Authorization: Bearer <token>
 ## 📊 Dashboard Endpoints
 
 ### 1. Get Dashboard Stats
+
 **GET** `/dashboard/stats`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": {
@@ -88,9 +97,11 @@ Authorization: Bearer <token>
 ```
 
 ### 2. Get Monthly Data
+
 **GET** `/dashboard/monthly`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [
@@ -109,9 +120,11 @@ Authorization: Bearer <token>
 ```
 
 ### 3. Get Category Data
+
 **GET** `/dashboard/category`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [
@@ -134,15 +147,18 @@ Authorization: Bearer <token>
 ## 💰 Transaction Endpoints
 
 ### 1. Get All Transactions
+
 **GET** `/transactions`
 
 **Query Parameters:**
+
 - `status` (optional): pending | approved | rejected
 - `type` (optional): income | expense
 - `startDate` (optional): YYYY-MM-DD
 - `endDate` (optional): YYYY-MM-DD
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [
@@ -169,9 +185,11 @@ Authorization: Bearer <token>
 ```
 
 ### 2. Get Transaction by ID
+
 **GET** `/transactions/:id`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": {
@@ -189,9 +207,11 @@ Authorization: Bearer <token>
 ```
 
 ### 3. Create Transaction
+
 **POST** `/transactions`
 
 **Request Body:**
+
 ```json
 {
   "type": "expense",
@@ -205,6 +225,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "message": "Transaction created successfully",
@@ -218,11 +239,13 @@ Authorization: Bearer <token>
 ```
 
 ### 4. Update Transaction
+
 **PUT** `/transactions/:id`
 
 **Request Body:** (Same as Create Transaction)
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Transaction updated successfully",
@@ -231,9 +254,11 @@ Authorization: Bearer <token>
 ```
 
 ### 5. Update Transaction Status
+
 **PUT** `/transactions/:id/status`
 
 **Request Body:**
+
 ```json
 {
   "status": "approved",
@@ -242,6 +267,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Transaction status updated successfully",
@@ -250,9 +276,11 @@ Authorization: Bearer <token>
 ```
 
 ### 6. Delete Transaction (Admin Only)
+
 **DELETE** `/transactions/:id`
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Transaction deleted successfully"
@@ -264,15 +292,18 @@ Authorization: Bearer <token>
 ## 📄 Report Endpoints
 
 ### 1. Get Reports
+
 **GET** `/reports`
 
 **Query Parameters:**
+
 - `startDate` (optional): YYYY-MM-DD
 - `endDate` (optional): YYYY-MM-DD
 - `type` (optional): income | expense
 - `category` (optional): Perkap | Konsumsi | etc
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [ ... ],
@@ -286,6 +317,7 @@ Authorization: Bearer <token>
 ```
 
 ### 2. Export to PDF
+
 **GET** `/reports/export/pdf`
 
 **Query Parameters:** (Same as Get Reports)
@@ -293,6 +325,7 @@ Authorization: Bearer <token>
 **Response:** PDF file download
 
 ### 3. Export to Excel
+
 **GET** `/reports/export/excel`
 
 **Query Parameters:** (Same as Get Reports)
@@ -304,9 +337,11 @@ Authorization: Bearer <token>
 ## 👥 User Management Endpoints (Admin Only)
 
 ### 1. Get All Users
+
 **GET** `/users`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [
@@ -322,17 +357,21 @@ Authorization: Bearer <token>
 ```
 
 ### 2. Get User by ID
+
 **GET** `/users/:id`
 
 ### 3. Create User
+
 **POST** `/users`
 
 **Request Body:** (Same as Register)
 
 ### 4. Update User
+
 **PUT** `/users/:id`
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe Updated",
@@ -342,6 +381,7 @@ Authorization: Bearer <token>
 ```
 
 ### 5. Delete User
+
 **DELETE** `/users/:id`
 
 ---
@@ -349,9 +389,11 @@ Authorization: Bearer <token>
 ## 📝 Activity Log Endpoints (Admin Only)
 
 ### 1. Get Activity Logs
+
 **GET** `/logs`
 
 **Response (200 OK):**
+
 ```json
 {
   "data": [
@@ -374,14 +416,17 @@ Authorization: Bearer <token>
 ## 📤 File Upload Endpoint
 
 ### Upload File
+
 **POST** `/upload`
 
 **Content-Type:** `multipart/form-data`
 
 **Form Data:**
+
 - `file`: The file to upload (image or PDF)
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "File uploaded successfully",
@@ -397,6 +442,7 @@ Authorization: Bearer <token>
 ## Error Responses
 
 ### 400 Bad Request
+
 ```json
 {
   "error": "Invalid request body"
@@ -404,6 +450,7 @@ Authorization: Bearer <token>
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "error": "Invalid or expired token"
@@ -411,6 +458,7 @@ Authorization: Bearer <token>
 ```
 
 ### 403 Forbidden
+
 ```json
 {
   "error": "Admin access required"
@@ -418,6 +466,7 @@ Authorization: Bearer <token>
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "error": "Resource not found"
@@ -425,6 +474,7 @@ Authorization: Bearer <token>
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "error": "Internal server error"

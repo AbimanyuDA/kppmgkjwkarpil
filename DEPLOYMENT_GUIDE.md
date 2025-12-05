@@ -33,6 +33,7 @@ Panduan lengkap untuk deploy aplikasi GKJW Finance System ke production.
 1. **Buat Account di [Supabase](https://supabase.com)**
 
 2. **Create New Project**
+
    ```
    Project Name: GKJW Finance
    Database Password: [generate strong password]
@@ -40,11 +41,13 @@ Panduan lengkap untuk deploy aplikasi GKJW Finance System ke production.
    ```
 
 3. **Get Connection String**
+
    ```
    Settings → Database → Connection String
    ```
 
 4. **Run Migration**
+
    ```bash
    psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -f backend/migrations/001_init.sql
    ```
@@ -89,6 +92,7 @@ psql -U gkjw_user -d gkjw_finance -f migrations/001_init.sql
 ### Option 1: Railway (Recommended - Easiest)
 
 1. **Push Code ke GitHub**
+
    ```bash
    git init
    git add .
@@ -98,12 +102,14 @@ psql -U gkjw_user -d gkjw_finance -f migrations/001_init.sql
    ```
 
 2. **Deploy ke Railway**
+
    - Visit [Railway.app](https://railway.app)
    - New Project → Deploy from GitHub
    - Select your repository
    - Select `backend` folder as root
 
 3. **Set Environment Variables**
+
    ```
    DB_HOST=[from supabase]
    DB_PORT=5432
@@ -121,11 +127,13 @@ psql -U gkjw_user -d gkjw_finance -f migrations/001_init.sql
 ### Option 2: Render
 
 1. **Create Web Service**
+
    - Visit [Render.com](https://render.com)
    - New → Web Service
    - Connect GitHub repo
 
 2. **Configure Service**
+
    ```
    Name: gkjw-finance-backend
    Environment: Go
@@ -141,6 +149,7 @@ psql -U gkjw_user -d gkjw_finance -f migrations/001_init.sql
 1. **Create Dockerfile** (already provided in project)
 
 2. **Build & Push to Registry**
+
    ```bash
    docker build -t gkjw-backend .
    docker tag gkjw-backend your-registry/gkjw-backend
@@ -170,11 +179,13 @@ curl https://your-backend-url.com/api/auth/login
 1. **Push Code ke GitHub** (if not already)
 
 2. **Deploy to Vercel**
+
    - Visit [Vercel.com](https://vercel.com)
    - New Project → Import from GitHub
    - Select `frontend` folder as root
 
 3. **Configure Build Settings**
+
    ```
    Framework Preset: Next.js
    Build Command: npm run build
@@ -183,6 +194,7 @@ curl https://your-backend-url.com/api/auth/login
    ```
 
 4. **Set Environment Variables**
+
    ```
    NEXT_PUBLIC_API_URL=https://your-backend-url.com/api
    NEXT_PUBLIC_APP_NAME=GKJW Finance System
@@ -196,10 +208,12 @@ curl https://your-backend-url.com/api/auth/login
 ### Option 2: Netlify
 
 1. **Connect Repository**
+
    - Visit [Netlify.com](https://netlify.com)
    - New site from Git
 
 2. **Build Settings**
+
    ```
    Build command: npm run build
    Publish directory: .next
@@ -238,23 +252,26 @@ pm2 startup
 1. **Buy Domain** (e.g., from Niagahoster, Namecheap)
 
 2. **Configure DNS**
+
    ```
    Type: A Record
    Name: @
    Value: [your-server-ip or CNAME to vercel]
-   
+
    Type: CNAME
    Name: api
    Value: [your-backend-domain]
    ```
 
 3. **SSL Certificate**
-   
+
    **For Vercel/Netlify (Automatic):**
+
    - Add custom domain in settings
    - SSL automatically configured
 
    **For Self-hosted:**
+
    ```bash
    # Install Certbot
    sudo apt install certbot python3-certbot-nginx
@@ -270,10 +287,12 @@ pm2 startup
 ### 1. Setup Monitoring
 
 #### Backend Monitoring (Railway/Render)
+
 - Use built-in metrics dashboard
 - Set up email alerts for downtime
 
 #### Custom Monitoring
+
 ```bash
 # Install Uptime Kuma (Self-hosted monitoring)
 docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:1
@@ -284,6 +303,7 @@ docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name upti
 #### Supabase (Automatic daily backups)
 
 #### Manual Backup
+
 ```bash
 # Backup database
 pg_dump -U postgres -h [host] -d gkjw_finance > backup_$(date +%Y%m%d).sql
@@ -315,6 +335,7 @@ pm2 logs gkjw-backend
 ### 5. Performance Optimization
 
 #### Frontend
+
 ```bash
 # Analyze bundle size
 npm run build
@@ -322,6 +343,7 @@ npx @next/bundle-analyzer
 ```
 
 #### Backend
+
 - Use connection pooling
 - Add Redis caching (optional)
 - Implement pagination
@@ -340,7 +362,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy-backend:
@@ -367,6 +389,7 @@ jobs:
 ### Common Issues
 
 1. **CORS Error**
+
    ```go
    // backend/main.go - check CORS settings
    router.Use(func(c *gin.Context) {
@@ -376,11 +399,13 @@ jobs:
    ```
 
 2. **Database Connection Failed**
+
    - Check connection string
    - Verify firewall rules
    - Test connection: `psql "postgres://..."`
 
 3. **JWT Token Invalid**
+
    - Ensure JWT_SECRET matches on backend
    - Check token expiration time
 
@@ -409,12 +434,14 @@ jobs:
 ## 💰 Cost Estimation (Monthly)
 
 ### Free Tier Setup
+
 - **Database**: Supabase (Free - 500MB)
 - **Backend**: Railway (Free - 500 hours)
 - **Frontend**: Vercel (Free - unlimited)
 - **Total**: FREE
 
 ### Production Setup
+
 - **Database**: Supabase Pro ($25)
 - **Backend**: Railway Pro ($5-20)
 - **Frontend**: Vercel Pro ($20)
@@ -426,6 +453,7 @@ jobs:
 ## 🎯 Success Metrics
 
 Monitor these metrics post-deployment:
+
 - ✅ Uptime > 99.9%
 - ✅ API response time < 200ms
 - ✅ Page load time < 2s

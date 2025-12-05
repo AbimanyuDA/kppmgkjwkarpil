@@ -1,77 +1,134 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import api from '@/lib/api'
-import { Upload } from 'lucide-react'
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import api from "@/lib/api";
+import { Upload } from "lucide-react";
+
+type Category = {
+  id: string;
+  name: string;
+  type?: string;
+};
 
 export default function UploadNotaPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [funds, setFunds] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
-    type: 'expense',
-    amount: '',
-    category: '',
-    description: '',
-    eventName: '',
-    date: new Date().toISOString().split('T')[0],
-  })
-  const [file, setFile] = useState<File | null>(null)
+    type: "expense",
+    amount: "",
+    category: "",
+    description: "",
+    eventName: "",
+    date: new Date().toISOString().split("T")[0],
+    fundId: "",
+    paymentMethod: "cash",
+  });
+  const [file, setFile] = useState<File | null>(null);
 
-  const categories = [
-    'Perkap',
-    'Konsumsi',
-    'Transport',
-    'Kegiatan',
-    'Logistik',
-    'Lain-lain',
-  ]
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fundRes, categoryRes] = await Promise.all([
+          api.get("/funds"),
+          api.get("/categories"),
+        ]);
+
+        const fundList = fundRes.data.data || [];
+        setFunds(fundList);
+        if (fundList.length > 0) {
+          setFormData((prev) => ({ ...prev, fundId: prev.fundId || fundList[0].id }));
+        }
+
+        const catList: Category[] = categoryRes.data.data || [];
+        setCategories(catList);
+        if (catList.length > 0) {
+          setFormData((prev) => ({ ...prev, category: prev.category || catList[0].name }));
+        }
+      } catch (err) {
+        console.error("Failed to load data", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      let noteUrl = ''
+      let noteUrl = "";
 
       // Upload file jika ada
       if (file) {
-        const fileFormData = new FormData()
-        fileFormData.append('file', file)
+        console.log("Uploading file:", file.name);
+        const fileFormData = new FormData();
+        fileFormData.append("file", file);
 
-        const uploadRes = await api.post('/upload', fileFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-        noteUrl = uploadRes.data.data.url
+        const uploadRes = await api.post("/upload", fileFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log("Upload response:", uploadRes.data);
+        noteUrl = uploadRes.data.data.url;
       }
 
       // Create transaction
-      await api.post('/transactions', {
+      console.log("Creating transaction with data:", {
         ...formData,
         amount: parseFloat(formData.amount),
         noteUrl,
-      })
+      });
 
-      alert('Transaksi berhasil dibuat!')
-      router.push('/dashboard/transactions')
+      const response = await api.post("/transactions", {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        paymentMethod: formData.paymentMethod,
+        noteUrl,
+      });
+
+      console.log("Transaction created:", response.data);
+      alert("Transaksi berhasil dibuat!");
+      router.push("/dashboard/transactions");
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Gagal membuat transaksi')
+      console.error("Error:", error);
+      console.error("Error response:", error.response?.data);
+      const errorMsg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Gagal membuat transaksi";
+      alert(errorMsg);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Upload Nota Pengeluaran</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Input Pengeluaran</h2>
         <p className="text-muted-foreground">
-          Input data pengeluaran dan upload bukti nota
+          Input data pengeluaran dan upload bukti nota (opsional)
         </p>
       </div>
 
@@ -104,16 +161,38 @@ export default function UploadNotaPage() {
                 onValueChange={(value) =>
                   setFormData({ ...formData, category: value })
                 }
+                required
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                    <SelectItem key={cat.id} value={cat.name}>
+                      {cat.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+              {!formData.category && (
+                <p className="text-sm text-red-500">Kategori harus dipilih</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paymentMethod">Metode Pembayaran</Label>
+              <Select
+                value={formData.paymentMethod}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, paymentMethod: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih metode pembayaran" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">💵 Tunai (Cash)</SelectItem>
+                  <SelectItem value="bank">🏦 Rekening Bank (Transfer)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -125,11 +204,45 @@ export default function UploadNotaPage() {
                 type="number"
                 placeholder="50000"
                 value={formData.amount}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, amount: e.target.value })
                 }
                 required
+                min="0"
               />
+              {formData.amount && (
+                <p className="text-sm text-muted-foreground">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(parseFloat(formData.amount))}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="fund">Fund / Proker *</Label>
+              <Select
+                value={formData.fundId}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, fundId: value })
+                }
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih fund" />
+                </SelectTrigger>
+                <SelectContent>
+                  {funds.map((fund) => (
+                    <SelectItem key={fund.id} value={fund.id}>
+                      {fund.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!formData.fundId && (
+                <p className="text-sm text-red-500">Fund harus dipilih</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -173,7 +286,7 @@ export default function UploadNotaPage() {
                 >
                   <Upload className="h-10 w-10 text-gray-400 mb-2" />
                   <span className="text-sm text-gray-600">
-                    {file ? file.name : 'Klik untuk upload file'}
+                    {file ? file.name : "Klik untuk upload file"}
                   </span>
                   <span className="text-xs text-gray-400 mt-1">
                     JPG, PNG, atau PDF (Max 5MB)
@@ -192,12 +305,12 @@ export default function UploadNotaPage() {
                 Batal
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Memproses...' : 'Submit Pengajuan'}
+                {loading ? "Memproses..." : "Submit Pengajuan"}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

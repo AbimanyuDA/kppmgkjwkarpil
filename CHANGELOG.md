@@ -7,18 +7,22 @@ All notable changes to GKJW Finance System will be documented in this file.
 ### ✨ Initial Release
 
 #### Features
+
 - ✅ User Authentication (JWT)
+
   - Login/Register
   - Role-based access control (Admin, Member, Viewer)
   - Password hashing with bcrypt
 
 - ✅ Dashboard
+
   - Real-time financial statistics
   - Monthly income vs expense charts
   - Category-wise expense breakdown
   - Pending transactions counter
 
 - ✅ Transaction Management
+
   - Create income/expense transactions
   - Upload receipt files (image/PDF)
   - View all transactions with filters
@@ -26,17 +30,20 @@ All notable changes to GKJW Finance System will be documented in this file.
   - Admin approval workflow
 
 - ✅ Financial Reports
+
   - Filter by date range, type, category
   - Export to PDF (planned)
   - Export to Excel (planned)
   - Print-friendly view
 
 - ✅ User Management (Admin only)
+
   - Create/Edit/Delete users
   - Manage user roles
   - View user list
 
 - ✅ Activity Logs (Admin only)
+
   - Track all user actions
   - Audit trail
 
@@ -47,6 +54,7 @@ All notable changes to GKJW Finance System will be documented in this file.
   - Dark mode support (CSS variables)
 
 #### Backend
+
 - Golang with Gin framework
 - PostgreSQL database
 - GORM ORM
@@ -55,6 +63,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - CORS configuration
 
 #### Frontend
+
 - Next.js 14 (App Router)
 - TypeScript
 - TailwindCSS
@@ -63,6 +72,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - Axios for API calls
 
 #### Database
+
 - PostgreSQL schema
 - Users table
 - Transactions table
@@ -70,6 +80,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - Database indexes for performance
 
 #### Documentation
+
 - Complete README
 - API documentation
 - Workflow diagrams
@@ -77,6 +88,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - Customization guide
 
 ### 🔒 Security
+
 - Password hashing with bcrypt
 - JWT token authentication
 - Protected API routes
@@ -84,6 +96,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - Input validation
 
 ### 📦 Infrastructure
+
 - Docker-ready
 - Environment configuration
 - Database migrations
@@ -94,6 +107,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 ## [Planned] - Future Versions
 
 ### v1.1.0 (Planned)
+
 - [ ] Email notifications
 - [ ] WhatsApp notifications
 - [ ] PDF export implementation
@@ -102,6 +116,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - [ ] Password reset functionality
 
 ### v1.2.0 (Planned)
+
 - [ ] Multi-language support (ID/EN)
 - [ ] Budget planning module
 - [ ] Recurring transactions
@@ -109,6 +124,7 @@ All notable changes to GKJW Finance System will be documented in this file.
 - [ ] Mobile app (React Native)
 
 ### v1.3.0 (Planned)
+
 - [ ] Integration with accounting software
 - [ ] Bank reconciliation
 - [ ] Invoice generation

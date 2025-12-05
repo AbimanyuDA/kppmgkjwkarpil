@@ -11,13 +11,15 @@ import (
 )
 
 type CreateTransactionRequest struct {
-	Type        string    `json:"type" binding:"required,oneof=income expense"`
-	Amount      float64   `json:"amount" binding:"required,gt=0"`
-	Category    string    `json:"category" binding:"required"`
-	Description string    `json:"description"`
-	EventName   string    `json:"eventName" binding:"required"`
-	Date        time.Time `json:"date" binding:"required"`
-	NoteURL     string    `json:"noteUrl"`
+	Type        string  `json:"type" binding:"required,oneof=income expense"`
+	PaymentMethod string `json:"paymentMethod" binding:"omitempty,oneof=cash bank"`
+	Amount      float64 `json:"amount" binding:"required,gt=0"`
+	Category    string  `json:"category" binding:"required"`
+	Description string  `json:"description"`
+	EventName   string  `json:"eventName" binding:"required"`
+	Date        string  `json:"date" binding:"required"`
+	NoteURL     string  `json:"noteUrl"`
+	FundID      string  `json:"fundId" binding:"required"`
 }
 
 type UpdateTransactionStatusRequest struct {
@@ -27,8 +29,8 @@ type UpdateTransactionStatusRequest struct {
 
 func GetTransactions(c *gin.Context) {
 	var transactions []models.Transaction
-	
-	query := config.DB.Preload("CreatedByUser").Order("created_at DESC")
+
+	query := config.DB.Preload("CreatedByUser").Preload("Fund").Order("created_at DESC")
 
 	// Filter by status
 	if status := c.Query("status"); status != "" {
@@ -40,12 +42,22 @@ func GetTransactions(c *gin.Context) {
 		query = query.Where("type = ?", txType)
 	}
 
+	// Filter by payment method
+	if pm := c.Query("paymentMethod"); pm != "" {
+		query = query.Where("payment_method = ?", pm)
+	}
+
 	// Filter by date range
 	if startDate := c.Query("startDate"); startDate != "" {
 		query = query.Where("date >= ?", startDate)
 	}
 	if endDate := c.Query("endDate"); endDate != "" {
 		query = query.Where("date <= ?", endDate)
+	}
+
+	// Filter by fund
+	if fundID := c.Query("fundId"); fundID != "" {
+		query = query.Where("fund_id = ?", fundID)
 	}
 
 	// For non-admin users, show only their own transactions
@@ -67,7 +79,7 @@ func GetTransactionByID(c *gin.Context) {
 	id := c.Param("id")
 	
 	var transaction models.Transaction
-	if err := config.DB.Preload("CreatedByUser").Where("id = ?", id).First(&transaction).Error; err != nil {
+	if err := config.DB.Preload("CreatedByUser").Preload("Fund").Where("id = ?", id).First(&transaction).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
 		return
 	}
@@ -85,13 +97,33 @@ func CreateTransaction(c *gin.Context) {
 	userID, _ := c.Get("userId")
 	userRole, _ := c.Get("userRole")
 
+	// Parse date string to time.Time
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+		return
+	}
+
+	parsedFund, err := uuid.Parse(req.FundID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid fundId"})
+		return
+	}
+
+	paymentMethod := req.PaymentMethod
+	if paymentMethod == "" {
+		paymentMethod = "cash"
+	}
+
 	transaction := models.Transaction{
+		FundID:      parsedFund,
 		Type:        req.Type,
+		PaymentMethod: paymentMethod,
 		Amount:      req.Amount,
 		Category:    req.Category,
 		Description: req.Description,
 		EventName:   req.EventName,
-		Date:        req.Date,
+		Date:        parsedDate,
 		CreatedBy:   userID.(uuid.UUID),
 		NoteURL:     req.NoteURL,
 		Status:      "pending",
@@ -131,12 +163,35 @@ func UpdateTransaction(c *gin.Context) {
 		return
 	}
 
+	// Parse date string to time.Time
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+		return
+	}
+
+	parsedFund, err := uuid.Parse(req.FundID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid fundId"})
+		return
+	}
+
+	paymentMethod := req.PaymentMethod
+	if paymentMethod == "" {
+		paymentMethod = transaction.PaymentMethod
+		if paymentMethod == "" {
+			paymentMethod = "cash"
+		}
+	}
+
+	transaction.FundID = parsedFund
 	transaction.Type = req.Type
+	transaction.PaymentMethod = paymentMethod
 	transaction.Amount = req.Amount
 	transaction.Category = req.Category
 	transaction.Description = req.Description
 	transaction.EventName = req.EventName
-	transaction.Date = req.Date
+	transaction.Date = parsedDate
 	transaction.NoteURL = req.NoteURL
 
 	if err := config.DB.Save(&transaction).Error; err != nil {

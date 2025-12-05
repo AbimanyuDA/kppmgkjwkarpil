@@ -19,7 +19,10 @@ type User struct {
 
 type Transaction struct {
 	ID              uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Type            string    `gorm:"not null" json:"type"` // income, expense
+	FundID          uuid.UUID `gorm:"type:uuid" json:"fundId"`
+	Fund            *Fund     `gorm:"foreignKey:FundID" json:"fund,omitempty"`
+	Type            string    `gorm:"not null" json:"type"`                         // income, expense
+	PaymentMethod   string    `gorm:"not null;default:'cash'" json:"paymentMethod"` // cash, bank
 	Amount          float64   `gorm:"not null" json:"amount"`
 	Category        string    `gorm:"not null" json:"category"`
 	Description     string    `json:"description"`
@@ -54,6 +57,41 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 func (t *Transaction) BeforeCreate(tx *gorm.DB) error {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()
+	}
+	return nil
+}
+
+// Fund represents a project / program fund envelope
+type Fund struct {
+	ID          uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Name        string    `gorm:"unique;not null" json:"name"`
+	Description string    `json:"description"`
+	Status      string    `gorm:"not null;default:'active'" json:"status"` // active, archived
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+// BeforeCreate hook for Fund
+func (f *Fund) BeforeCreate(tx *gorm.DB) error {
+	if f.ID == uuid.Nil {
+		f.ID = uuid.New()
+	}
+	return nil
+}
+
+// Category represents transaction category label (can be used for both income and expense)
+type Category struct {
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Type      string    `gorm:"not null;default:'general';index:idx_categories_type_name" json:"type"` // income, expense, or general
+	Name      string    `gorm:"not null;index:idx_categories_type_name" json:"name"`                   // category name
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// BeforeCreate hook for Category
+func (c *Category) BeforeCreate(tx *gorm.DB) error {
+	if c.ID == uuid.Nil {
+		c.ID = uuid.New()
 	}
 	return nil
 }

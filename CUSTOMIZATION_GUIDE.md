@@ -31,8 +31,8 @@ Edit `frontend/src/app/globals.css`:
 
 ```css
 :root {
-  --primary: 221.2 83.2% 53.3%;  /* Biru navy */
-  --secondary: 45 93% 47%;        /* Emas */
+  --primary: 221.2 83.2% 53.3%; /* Biru navy */
+  --secondary: 45 93% 47%; /* Emas */
   /* Ubah nilai HSL sesuai warna yang diinginkan */
 }
 ```
@@ -55,9 +55,7 @@ Edit `frontend/src/app/login/page.tsx`:
 ```tsx
 <div className="text-center mb-8">
   <Image src="/logo.png" alt="Logo" width={100} height={100} />
-  <h1 className="text-3xl font-bold text-white mb-2">
-    GKJW Nama Gereja Anda
-  </h1>
+  <h1 className="text-3xl font-bold text-white mb-2">GKJW Nama Gereja Anda</h1>
 </div>
 ```
 
@@ -89,7 +87,7 @@ Edit `frontend/src/app/layout.tsx`:
 export const metadata: Metadata = {
   title: "Sistem Keuangan [Nama Gereja]",
   description: "Sistem Pelaporan Keuangan [Nama Gereja]",
-}
+};
 ```
 
 ## 📊 Menambah Kategori Baru
@@ -117,15 +115,15 @@ Edit `frontend/src/app/dashboard/upload/page.tsx`:
 
 ```tsx
 const categories = [
-  'Perkap',
-  'Konsumsi',
-  'Transport',
-  'Kegiatan',
-  'Logistik',
-  'Pembangunan',  // Tambahkan di sini
-  'Misi',          // Tambahkan di sini
-  'Lain-lain',
-]
+  "Perkap",
+  "Konsumsi",
+  "Transport",
+  "Kegiatan",
+  "Logistik",
+  "Pembangunan", // Tambahkan di sini
+  "Misi", // Tambahkan di sini
+  "Lain-lain",
+];
 ```
 
 ## 🔔 Menambah Fitur Notifikasi Email
@@ -208,7 +206,7 @@ import (
 
 func SendWhatsApp(to, message string) error {
     client := twilio.NewRestClient()
-    
+
     params := &twilioApi.CreateMessageParams{}
     params.SetFrom("whatsapp:+14155238886")
     params.SetTo("whatsapp:" + to)
@@ -239,21 +237,21 @@ import (
 func GeneratePDFReport(transactions []Transaction) ([]byte, error) {
     pdf := gofpdf.New("P", "mm", "A4", "")
     pdf.AddPage()
-    
+
     // Header dengan logo
-    pdf.ImageOptions("logo.png", 10, 6, 30, 0, false, 
+    pdf.ImageOptions("logo.png", 10, 6, 30, 0, false,
         gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}, 0, "")
-    
+
     pdf.SetFont("Arial", "B", 16)
     pdf.Cell(40, 10, "Laporan Keuangan GKJW")
-    
+
     // Table
     pdf.SetFont("Arial", "B", 12)
     pdf.Cell(40, 7, "Tanggal")
     pdf.Cell(40, 7, "Kategori")
     pdf.Cell(40, 7, "Jumlah")
     pdf.Ln(-1)
-    
+
     // Data
     pdf.SetFont("Arial", "", 11)
     for _, tx := range transactions {
@@ -262,7 +260,7 @@ func GeneratePDFReport(transactions []Transaction) ([]byte, error) {
         pdf.Cell(40, 6, fmt.Sprintf("Rp %,.0f", tx.Amount))
         pdf.Ln(-1)
     }
-    
+
     return pdf.Output(dest)
 }
 ```
@@ -349,13 +347,15 @@ valid := totp.Validate(code, user.TwoFactorSecret)
 Semua halaman sudah responsive by default dengan Tailwind, tapi Anda bisa customize:
 
 ```tsx
-<div className="
+<div
+  className="
   grid 
   gap-4 
   grid-cols-1      /* Mobile: 1 kolom */
   md:grid-cols-2   /* Tablet: 2 kolom */
   lg:grid-cols-4   /* Desktop: 4 kolom */
-">
+"
+>
   {/* Content */}
 </div>
 ```
@@ -398,6 +398,7 @@ pg_dump -U postgres gkjw_finance > backup_$DATE.sql
 ```
 
 Add to cron:
+
 ```bash
 0 2 * * * /path/to/backup.sh
 ```
