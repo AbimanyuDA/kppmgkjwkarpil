@@ -132,17 +132,25 @@ export default function TransactionsPage() {
     if (!selectedTransaction) return;
 
     try {
-      await api.put(`/transactions/${selectedTransaction.id}`, {
-        ...editFormData,
-        type: editFormData.type,
-        amount: parseFloat(editFormData.amount),
-      });
-      setShowEditModal(false);
-      alert("Transaksi berhasil diupdate!");
-      fetchTransactions();
+      // TODO: Implement /api/transactions/[id] endpoint
+      alert("Fitur ini belum tersedia");
+      return;
+      
+      // await fetch(`/api/transactions/${selectedTransaction.id}`, {
+      //   method: "PUT",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     ...editFormData,
+      //     type: editFormData.type,
+      //     amount: parseFloat(editFormData.amount),
+      //   }),
+      // });
+      // setShowEditModal(false);
+      // alert("Transaksi berhasil diupdate!");
+      // fetchTransactions();
     } catch (error: any) {
       console.error("Error updating transaction:", error);
-      alert(error.response?.data?.error || "Gagal update transaksi");
+      alert("Gagal update transaksi");
     }
   };
 
