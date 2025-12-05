@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import api from "@/lib/api";
 import {
   Download,
   FileText,
@@ -61,16 +60,18 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchFunds = async () => {
       try {
-        const res = await api.get("/funds");
-        setFunds(res.data.data || []);
+        const res = await fetch("/api/funds");
+        const json = await res.json();
+        setFunds(json.data || []);
       } catch (err) {
         console.error("Error fetching funds", err);
       }
     };
     const fetchCategories = async () => {
       try {
-        const res = await api.get("/categories");
-        setCategories(res.data.data || []);
+        const res = await fetch("/api/categories");
+        const json = await res.json();
+        setCategories(json.data || []);
       } catch (err) {
         console.error("Error fetching categories", err);
       }
@@ -83,32 +84,19 @@ export default function ReportsPage() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (filters.startDate) params.append("startDate", filters.startDate);
-      if (filters.endDate) params.append("endDate", filters.endDate);
-      if (filters.type) params.append("type", filters.type);
-      if (filters.category) params.append("category", filters.category);
-      if (filters.fundId) params.append("fundId", filters.fundId);
-
-      const response = await api.get(`/reports?${params.toString()}`);
-      const raw = response.data.data || [];
-
-      // Sort oldest->newest to compute running balance, then flip to show newest on top
-      const sortedAsc = [...raw].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      );
-
-      let running = 0;
-      const withBalance = sortedAsc.map((t) => {
-        running += t.type === "income" ? t.amount : -t.amount;
-        return { ...t, runningBalance: running };
-      });
-
-      const newestFirst = withBalance.reverse();
-
-      setTransactions(newestFirst);
-      setSummary(response.data.summary);
-      setCurrentPage(1); // Reset to first page on new search
+      // TODO: Implement /api/reports endpoint
+      // const params = new URLSearchParams();
+      // if (filters.startDate) params.append("startDate", filters.startDate);
+      // if (filters.endDate) params.append("endDate", filters.endDate);
+      // if (filters.type) params.append("type", filters.type);
+      // if (filters.category) params.append("category", filters.category);
+      // if (filters.fundId) params.append("fundId", filters.fundId);
+      // const response = await fetch(`/api/reports?${params.toString()}`);
+      // const json = await response.json();
+      // const raw = json.data || [];
+      // ... process data
+      setTransactions([]);
+      setSummary(null);
     } catch (error) {
       console.error("Error fetching reports:", error);
     } finally {
@@ -138,12 +126,10 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      const response = await api.get(
-        `/reports/export/pdf?${params.toString()}`,
-        {
-          responseType: "blob",
-        }
-      );
+      // TODO: Implement /api/reports/export/pdf endpoint
+      alert("Export PDF belum tersedia");
+      return;
+      // const response = await fetch(`/api/reports/export/pdf?${params.toString()}`);
 
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -175,12 +161,10 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      const response = await api.get(
-        `/reports/export/excel?${params.toString()}`,
-        {
-          responseType: "blob",
-        }
-      );
+      // TODO: Implement /api/reports/export/excel endpoint
+      alert("Export Excel belum tersedia");
+      return;
+      // const response = await fetch(`/api/reports/export/excel?${params.toString()}`);
 
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));

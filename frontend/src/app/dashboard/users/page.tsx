@@ -35,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
 import { UserPlus, Pencil, Trash2 } from "lucide-react";
 
 export default function UsersPage() {
@@ -56,8 +55,11 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get("/users");
-      setUsers(response.data.data);
+      // TODO: Implement /api/users endpoint
+      // const response = await fetch("/api/users");
+      // const json = await response.json();
+      // setUsers(json.data || []);
+      setUsers([]);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
@@ -89,9 +91,13 @@ export default function UsersPage() {
   const handleSubmit = async () => {
     try {
       if (editingUser) {
-        await api.put(`/users/${editingUser.id}`, formData);
+        // TODO: Implement /api/users/[id] endpoint
+        alert("Fitur ini belum tersedia");
+        return;
       } else {
-        await api.post("/users", formData);
+        // TODO: Implement /api/users endpoint
+        alert("Fitur ini belum tersedia");
+        return;
       }
       setShowModal(false);
       fetchUsers();
@@ -104,7 +110,10 @@ export default function UsersPage() {
     if (!confirm("Yakin ingin menghapus user ini?")) return;
 
     try {
-      await api.delete(`/users/${id}`);
+      // TODO: Implement /api/users/[id] endpoint
+      alert("Fitur ini belum tersedia");
+      return;
+      // await fetch(`/api/users/${id}`, { method: "DELETE" });
       fetchUsers();
     } catch (error) {
       alert("Failed to delete user");

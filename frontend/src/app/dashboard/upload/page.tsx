@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
 import { Upload } from "lucide-react";
 
 type Category = {
@@ -49,11 +48,13 @@ export default function UploadNotaPage() {
     const fetchData = async () => {
       try {
         const [fundRes, categoryRes] = await Promise.all([
-          api.get("/funds"),
-          api.get("/categories"),
+          fetch("/api/funds"),
+          fetch("/api/categories"),
         ]);
+        const fundJson = await fundRes.json();
+        const categoryJson = await categoryRes.json();
 
-        const fundList = fundRes.data.data || [];
+        const fundList = fundJson.data || [];
         setFunds(fundList);
         if (fundList.length > 0) {
           setFormData((prev) => ({
@@ -62,7 +63,7 @@ export default function UploadNotaPage() {
           }));
         }
 
-        const catList: Category[] = categoryRes.data.data || [];
+        const catList: Category[] = categoryJson.data || [];
         setCategories(catList);
         if (catList.length > 0) {
           setFormData((prev) => ({
@@ -91,9 +92,10 @@ export default function UploadNotaPage() {
         const fileFormData = new FormData();
         fileFormData.append("file", file);
 
-        const uploadRes = await api.post("/upload", fileFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        // TODO: Implement /api/upload endpoint for file upload
+        alert("Upload file belum tersedia");
+        return;
+        // const uploadRes = await fetch("/api/upload", { method: "POST", body: fileFormData });
         console.log("Upload response:", uploadRes.data);
         noteUrl = uploadRes.data.data.url;
       }
@@ -105,7 +107,10 @@ export default function UploadNotaPage() {
         noteUrl,
       });
 
-      const response = await api.post("/transactions", {
+      // TODO: Implement /api/transactions endpoint
+      alert("Fitur ini belum tersedia");
+      return;
+      // const response = await fetch("/api/transactions", { method: "POST", body: JSON.stringify({
         ...formData,
         amount: parseFloat(formData.amount),
         paymentMethod: formData.paymentMethod,

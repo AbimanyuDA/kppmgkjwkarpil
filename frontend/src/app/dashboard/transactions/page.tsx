@@ -22,7 +22,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import api from "@/lib/api";
 import { CheckCircle, XCircle, Eye, Pencil } from "lucide-react";
 import {
   Select,
@@ -64,8 +63,9 @@ export default function TransactionsPage() {
 
   const fetchFunds = async () => {
     try {
-      const res = await api.get("/funds");
-      setFunds(res.data.data || []);
+      const res = await fetch("/api/funds");
+      const json = await res.json();
+      setFunds(json.data || []);
     } catch (err) {
       console.error("Failed to load funds", err);
     }
@@ -73,8 +73,11 @@ export default function TransactionsPage() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await api.get("/transactions");
-      setTransactions(response.data.data);
+      // TODO: Implement /api/transactions endpoint
+      // const response = await fetch("/api/transactions");
+      // const json = await response.json();
+      // setTransactions(json.data || []);
+      setTransactions([]);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
@@ -84,7 +87,10 @@ export default function TransactionsPage() {
 
   const handleApprove = async (id: string) => {
     try {
-      await api.put(`/transactions/${id}/status`, { status: "approved" });
+      // TODO: Implement /api/transactions/[id]/status endpoint
+      alert("Fitur ini belum tersedia");
+      return;
+      // await fetch(`/api/transactions/${id}/status`, { method: "PUT", body: JSON.stringify({ status: "approved" }) });
       fetchTransactions();
     } catch (error) {
       console.error("Error approving transaction:", error);
@@ -95,10 +101,10 @@ export default function TransactionsPage() {
     if (!selectedTransaction) return;
 
     try {
-      await api.put(`/transactions/${selectedTransaction.id}/status`, {
-        status: "rejected",
-        rejectionReason,
-      });
+      // TODO: Implement /api/transactions/[id]/status endpoint
+      alert("Fitur ini belum tersedia");
+      return;
+      // await fetch(`/api/transactions/${selectedTransaction.id}/status`, { method: "PUT", body: JSON.stringify({ status: "rejected", rejectionReason }) });
       setShowRejectModal(false);
       setRejectionReason("");
       fetchTransactions();
