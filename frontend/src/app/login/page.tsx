@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { loginApi } from "@/lib/api";
+import api from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,20 +27,24 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await loginApi(email, password);
-      const { token, user } = response.data;
+      console.log("Attempting login...");
+      const response = await api.post("/auth/login", { email, password });
+      console.log("Login response:", response.data);
+      
+      const { token, user } = response.data.data;
+
       if (!token || !user) {
         throw new Error("Invalid response format");
       }
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+
+      console.log("Login successful, redirecting...");
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Login error:", err);
-      const errorMessage =
-        err.response?.data?.error ||
-        err.message ||
-        "Login gagal. Silakan coba lagi.";
+      const errorMessage = err.response?.data?.error || err.message || "Login gagal. Silakan coba lagi.";
       setError(errorMessage);
       setLoading(false);
     }

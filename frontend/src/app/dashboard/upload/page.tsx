@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import api from "@/lib/api";
 import { Upload } from "lucide-react";
 
 type Category = {
@@ -48,28 +49,20 @@ export default function UploadNotaPage() {
     const fetchData = async () => {
       try {
         const [fundRes, categoryRes] = await Promise.all([
-          fetch("/api/funds"),
-          fetch("/api/categories"),
+          api.get("/funds"),
+          api.get("/categories"),
         ]);
-        const fundJson = await fundRes.json();
-        const categoryJson = await categoryRes.json();
 
-        const fundList = fundJson.data || [];
+        const fundList = fundRes.data.data || [];
         setFunds(fundList);
         if (fundList.length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            fundId: prev.fundId || fundList[0].id,
-          }));
+          setFormData((prev) => ({ ...prev, fundId: prev.fundId || fundList[0].id }));
         }
 
-        const catList: Category[] = categoryJson.data || [];
+        const catList: Category[] = categoryRes.data.data || [];
         setCategories(catList);
         if (catList.length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            category: prev.category || catList[0].name,
-          }));
+          setFormData((prev) => ({ ...prev, category: prev.category || catList[0].name }));
         }
       } catch (err) {
         console.error("Failed to load data", err);
@@ -92,14 +85,11 @@ export default function UploadNotaPage() {
         const fileFormData = new FormData();
         fileFormData.append("file", file);
 
-        // TODO: Implement /api/upload endpoint for file upload
-        alert("Upload file belum tersedia");
-        return;
-        
-        // const uploadRes = await fetch("/api/upload", { method: "POST", body: fileFormData });
-        // const uploadJson = await uploadRes.json();
-        // console.log("Upload response:", uploadJson);
-        // noteUrl = uploadJson.data?.url || "";
+        const uploadRes = await api.post("/upload", fileFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log("Upload response:", uploadRes.data);
+        noteUrl = uploadRes.data.data.url;
       }
 
       // Create transaction
@@ -109,23 +99,16 @@ export default function UploadNotaPage() {
         noteUrl,
       });
 
-      // TODO: Implement /api/transactions endpoint
-      alert("Fitur ini belum tersedia");
-      return;
-      
-      // const response = await fetch("/api/transactions", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     ...formData,
-      //     amount: parseFloat(formData.amount),
-      //     paymentMethod: formData.paymentMethod,
-      //     noteUrl,
-      //   }),
-      // });
-      // console.log("Transaction created");
-      // alert("Transaksi berhasil dibuat!");
-      // router.push("/dashboard/transactions");
+      const response = await api.post("/transactions", {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        paymentMethod: formData.paymentMethod,
+        noteUrl,
+      });
+
+      console.log("Transaction created:", response.data);
+      alert("Transaksi berhasil dibuat!");
+      router.push("/dashboard/transactions");
     } catch (error: any) {
       console.error("Error:", error);
       console.error("Error response:", error.response?.data);
@@ -209,9 +192,7 @@ export default function UploadNotaPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cash">💵 Tunai (Cash)</SelectItem>
-                  <SelectItem value="bank">
-                    🏦 Rekening Bank (Transfer)
-                  </SelectItem>
+                  <SelectItem value="bank">🏦 Rekening Bank (Transfer)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

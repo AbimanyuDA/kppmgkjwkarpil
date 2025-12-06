@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Plus, Save, X } from "lucide-react";
-// ...existing code...
+import api from "@/lib/api";
 
 type Category = {
   id: string;
@@ -31,9 +31,7 @@ type Category = {
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
-  const [editing, setEditing] = useState<{ id: string; value: string } | null>(
-    null
-  );
+  const [editing, setEditing] = useState<{ id: string; value: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,14 +39,15 @@ export default function CategoriesPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/categories");
-      const json = await res.json();
-      const data: Category[] = json.data || [];
+      const res = await api.get("/categories");
+      const data: Category[] = res.data.data || [];
       setCategories(data.sort((a, b) => a.name.localeCompare(b.name)));
     } catch (err: any) {
       console.error("Failed to load categories", err);
       const message =
-        err?.response?.data?.error || err?.message || "Gagal memuat kategori";
+        err?.response?.data?.error ||
+        err?.message ||
+        "Gagal memuat kategori";
       setError(message);
       alert(message);
     } finally {
@@ -64,11 +63,7 @@ export default function CategoriesPage() {
     const name = newCategory.trim();
     if (!name) return alert("Kategori tidak boleh kosong");
     try {
-      await fetch("/api/categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
+      await api.post("/categories", { name });
       setNewCategory("");
       fetchCategories();
     } catch (err: any) {
@@ -79,11 +74,7 @@ export default function CategoriesPage() {
   const deleteCategory = async (id: string) => {
     if (!confirm("Yakin ingin menghapus kategori ini?")) return;
     try {
-      await fetch("/api/categories", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+      await api.delete(`/categories/${id}`);
       fetchCategories();
     } catch (err: any) {
       alert(err.response?.data?.error || "Gagal menghapus kategori");
@@ -99,11 +90,7 @@ export default function CategoriesPage() {
     const name = editing.value.trim();
     if (!name) return alert("Nama kategori tidak boleh kosong");
     try {
-      await fetch("/api/categories", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editing.id, name }),
-      });
+      await api.put(`/categories/${editing.id}`, { name });
       setEditing(null);
       fetchCategories();
     } catch (err: any) {
@@ -117,12 +104,9 @@ export default function CategoriesPage() {
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            📂 Kelola Kategori
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">📂 Kelola Kategori</h2>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Berlaku untuk pemasukan & pengeluaran. Daftar di bawah diambil dari
-            data transaksi dan bisa ditambah/edit/hapus.
+            Berlaku untuk pemasukan & pengeluaran. Daftar di bawah diambil dari data transaksi dan bisa ditambah/edit/hapus.
           </p>
         </div>
       </div>
@@ -174,9 +158,7 @@ export default function CategoriesPage() {
                       {editing?.id === category.id ? (
                         <Input
                           value={editing.value}
-                          onChange={(e) =>
-                            setEditing({ ...editing, value: e.target.value })
-                          }
+                          onChange={(e) => setEditing({ ...editing, value: e.target.value })}
                           onKeyPress={(e) => e.key === "Enter" && saveEdit()}
                           autoFocus
                         />
@@ -184,37 +166,23 @@ export default function CategoriesPage() {
                         <Badge variant="secondary">{category.name}</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="capitalize">
-                      {category.type || "general"}
-                    </TableCell>
+                    <TableCell className="capitalize">{category.type || "general"}</TableCell>
                     <TableCell className="text-right">
                       {editing?.id === category.id ? (
                         <div className="flex gap-1 justify-end">
                           <Button size="sm" variant="ghost" onClick={saveEdit}>
                             <Save className="h-4 w-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={cancelEdit}
-                          >
+                          <Button size="sm" variant="ghost" onClick={cancelEdit}>
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
                       ) : (
                         <div className="flex gap-1 justify-end">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => startEdit(category)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => startEdit(category)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteCategory(category.id)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => deleteCategory(category.id)}>
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
                         </div>
@@ -224,10 +192,7 @@ export default function CategoriesPage() {
                 ))}
                 {categories.length === 0 && (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-sm text-muted-foreground"
-                    >
+                    <TableCell colSpan={4} className="text-center text-sm text-muted-foreground">
                       {loading ? "Memuat kategori..." : "Belum ada kategori"}
                     </TableCell>
                   </TableRow>

@@ -1,14 +1,36 @@
-// ...existing code...
-// Only keep API functions for Next.js API routes (Supabase)
-export async function loginApi(email: string, password: string) {
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || "Login gagal");
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Request interceptor untuk menambahkan token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
   }
-  return res.json();
-}
+)
+
+// Response interceptor untuk handle errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default api

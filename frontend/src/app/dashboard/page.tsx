@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { BarChart } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
+import api from "@/lib/api";
 import { ArrowUpCircle, ArrowDownCircle, Wallet, Clock } from "lucide-react";
 
 export default function DashboardPage() {
@@ -43,15 +44,24 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      // TODO: Implement dashboard API endpoints
-      // const [statsRes, monthlyRes, categoryRes] = await Promise.all([
-      //   fetch("/api/dashboard/stats"),
-      //   fetch("/api/dashboard/monthly"),
-      //   fetch("/api/dashboard/category"),
-      // ]);
-      // For now, using dummy data
+      const [statsRes, monthlyRes, categoryRes] = await Promise.all([
+        api.get("/dashboard/stats"),
+        api.get("/dashboard/monthly"),
+        api.get("/dashboard/category"),
+      ]);
+
+      if (statsRes.data.data) {
+        setStats(statsRes.data.data);
+      }
+      if (monthlyRes.data.data && monthlyRes.data.data.length > 0) {
+        setMonthlyData(monthlyRes.data.data);
+      }
+      if (categoryRes.data.data && categoryRes.data.data.length > 0) {
+        setCategoryData(categoryRes.data.data);
+      }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      // Keep dummy data if API fails
     } finally {
       setLoading(false);
     }

@@ -1,140 +1,105 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { UserPlus, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import api from '@/lib/api'
+import { UserPlus, Pencil, Trash2 } from 'lucide-react'
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [editingUser, setEditingUser] = useState<any>(null)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "member",
-  });
+    name: '',
+    email: '',
+    password: '',
+    role: 'member',
+  })
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers()
+  }, [])
 
   const fetchUsers = async () => {
     try {
-      // TODO: Implement /api/users endpoint
-      // const response = await fetch("/api/users");
-      // const json = await response.json();
-      // setUsers(json.data || []);
-      setUsers([]);
+      const response = await api.get('/users')
+      setUsers(response.data.data)
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleOpenModal = (user?: any) => {
     if (user) {
-      setEditingUser(user);
+      setEditingUser(user)
       setFormData({
         name: user.name,
         email: user.email,
-        password: "",
+        password: '',
         role: user.role,
-      });
+      })
     } else {
-      setEditingUser(null);
+      setEditingUser(null)
       setFormData({
-        name: "",
-        email: "",
-        password: "",
-        role: "member",
-      });
+        name: '',
+        email: '',
+        password: '',
+        role: 'member',
+      })
     }
-    setShowModal(true);
-  };
+    setShowModal(true)
+  }
 
   const handleSubmit = async () => {
     try {
       if (editingUser) {
-        // TODO: Implement /api/users/[id] endpoint
-        alert("Fitur ini belum tersedia");
-        return;
+        await api.put(`/users/${editingUser.id}`, formData)
       } else {
-        // TODO: Implement /api/users endpoint
-        alert("Fitur ini belum tersedia");
-        return;
+        await api.post('/users', formData)
       }
-      setShowModal(false);
-      fetchUsers();
+      setShowModal(false)
+      fetchUsers()
     } catch (error: any) {
-      alert(error.response?.data?.error || "Failed to save user");
+      alert(error.response?.data?.error || 'Failed to save user')
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Yakin ingin menghapus user ini?")) return;
+    if (!confirm('Yakin ingin menghapus user ini?')) return
 
     try {
-      // TODO: Implement /api/users/[id] endpoint
-      alert("Fitur ini belum tersedia");
-      return;
-      // await fetch(`/api/users/${id}`, { method: "DELETE" });
-      fetchUsers();
+      await api.delete(`/users/${id}`)
+      fetchUsers()
     } catch (error) {
-      alert("Failed to delete user");
+      alert('Failed to delete user')
     }
-  };
+  }
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case "admin":
-        return <Badge variant="destructive">Admin</Badge>;
-      case "member":
-        return <Badge variant="default">Member</Badge>;
-      case "viewer":
-        return <Badge variant="secondary">Viewer</Badge>;
+      case 'admin':
+        return <Badge variant="destructive">Admin</Badge>
+      case 'member':
+        return <Badge variant="default">Member</Badge>
+      case 'viewer':
+        return <Badge variant="secondary">Viewer</Badge>
       default:
-        return <Badge>{role}</Badge>;
+        return <Badge>{role}</Badge>
     }
-  };
+  }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
@@ -142,7 +107,9 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Manajemen User</h2>
-          <p className="text-muted-foreground">Kelola akses user sistem</p>
+          <p className="text-muted-foreground">
+            Kelola akses user sistem
+          </p>
         </div>
         <Button onClick={() => handleOpenModal()}>
           <UserPlus className="mr-2 h-4 w-4" />
@@ -153,7 +120,9 @@ export default function UsersPage() {
       <Card>
         <CardHeader>
           <CardTitle>Daftar User</CardTitle>
-          <CardDescription>{users.length} user terdaftar</CardDescription>
+          <CardDescription>
+            {users.length} user terdaftar
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -173,7 +142,7 @@ export default function UsersPage() {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>
-                    {new Date(user.createdAt).toLocaleDateString("id-ID")}
+                    {new Date(user.createdAt).toLocaleDateString('id-ID')}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -206,10 +175,10 @@ export default function UsersPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingUser ? "Edit User" : "Tambah User Baru"}
+              {editingUser ? 'Edit User' : 'Tambah User Baru'}
             </DialogTitle>
             <DialogDescription>
-              {editingUser ? "Update informasi user" : "Buat akun user baru"}
+              {editingUser ? 'Update informasi user' : 'Buat akun user baru'}
             </DialogDescription>
           </DialogHeader>
 
@@ -219,9 +188,7 @@ export default function UsersPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Masukkan nama lengkap"
               />
             </div>
@@ -232,9 +199,7 @@ export default function UsersPage() {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="email@example.com"
               />
             </div>
@@ -246,9 +211,7 @@ export default function UsersPage() {
                   id="password"
                   type="password"
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Minimal 6 karakter"
                 />
               </div>
@@ -258,9 +221,7 @@ export default function UsersPage() {
               <Label htmlFor="role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, role: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -279,11 +240,11 @@ export default function UsersPage() {
               Batal
             </Button>
             <Button onClick={handleSubmit}>
-              {editingUser ? "Update" : "Tambah"}
+              {editingUser ? 'Update' : 'Tambah'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

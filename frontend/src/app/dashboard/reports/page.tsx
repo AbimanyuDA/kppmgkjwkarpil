@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import api from "@/lib/api";
 import {
   Download,
   FileText,
@@ -60,18 +61,16 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchFunds = async () => {
       try {
-        const res = await fetch("/api/funds");
-        const json = await res.json();
-        setFunds(json.data || []);
+        const res = await api.get("/funds");
+        setFunds(res.data.data || []);
       } catch (err) {
         console.error("Error fetching funds", err);
       }
     };
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories");
-        const json = await res.json();
-        setCategories(json.data || []);
+        const res = await api.get("/categories");
+        setCategories(res.data.data || []);
       } catch (err) {
         console.error("Error fetching categories", err);
       }
@@ -84,19 +83,32 @@ export default function ReportsPage() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      // TODO: Implement /api/reports endpoint
-      // const params = new URLSearchParams();
-      // if (filters.startDate) params.append("startDate", filters.startDate);
-      // if (filters.endDate) params.append("endDate", filters.endDate);
-      // if (filters.type) params.append("type", filters.type);
-      // if (filters.category) params.append("category", filters.category);
-      // if (filters.fundId) params.append("fundId", filters.fundId);
-      // const response = await fetch(`/api/reports?${params.toString()}`);
-      // const json = await response.json();
-      // const raw = json.data || [];
-      // ... process data
-      setTransactions([]);
-      setSummary(null);
+      const params = new URLSearchParams();
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.endDate) params.append("endDate", filters.endDate);
+      if (filters.type) params.append("type", filters.type);
+      if (filters.category) params.append("category", filters.category);
+      if (filters.fundId) params.append("fundId", filters.fundId);
+
+      const response = await api.get(`/reports?${params.toString()}`);
+      const raw = response.data.data || [];
+
+      // Sort oldest->newest to compute running balance, then flip to show newest on top
+      const sortedAsc = [...raw].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      let running = 0;
+      const withBalance = sortedAsc.map((t) => {
+        running += t.type === "income" ? t.amount : -t.amount;
+        return { ...t, runningBalance: running };
+      });
+
+      const newestFirst = withBalance.reverse();
+
+      setTransactions(newestFirst);
+      setSummary(response.data.summary);
+      setCurrentPage(1); // Reset to first page on new search
     } catch (error) {
       console.error("Error fetching reports:", error);
     } finally {
@@ -126,20 +138,25 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      // TODO: Implement /api/reports/export/pdf endpoint
-      alert("Export PDF belum tersedia");
-      return;
-      
-      // const response = await fetch(`/api/reports/export/pdf?${params.toString()}`);
-      // const blob = await response.blob();
-      // const url = window.URL.createObjectURL(blob);
-      // const link = document.createElement("a");
-      // link.href = url;
-      // link.setAttribute("download", `laporan_keuangan_${new Date().getTime()}.pdf`);
-      // document.body.appendChild(link);
-      // link.click();
-      // link.remove();
-      // window.URL.revokeObjectURL(url);
+      const response = await api.get(
+        `/reports/export/pdf?${params.toString()}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `laporan_keuangan_${new Date().getTime()}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting PDF:", error);
       alert("Gagal export PDF");
@@ -158,20 +175,25 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      // TODO: Implement /api/reports/export/excel endpoint
-      alert("Export Excel belum tersedia");
-      return;
-      
-      // const response = await fetch(`/api/reports/export/excel?${params.toString()}`);
-      // const blob = await response.blob();
-      // const url = window.URL.createObjectURL(blob);
-      // const link = document.createElement("a");
-      // link.href = url;
-      // link.setAttribute("download", `laporan_keuangan_${new Date().getTime()}.xlsx`);
-      // document.body.appendChild(link);
-      // link.click();
-      // link.remove();
-      // window.URL.revokeObjectURL(url);
+      const response = await api.get(
+        `/reports/export/excel?${params.toString()}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `laporan_keuangan_${new Date().getTime()}.xlsx`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting Excel:", error);
       alert("Gagal export Excel");
@@ -429,8 +451,7 @@ export default function ReportsPage() {
                 📊 Laporan Cashflow
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Laporan arus kas dengan saldo berjalan ({transactions.length}{" "}
-                transaksi)
+                Laporan arus kas dengan saldo berjalan ({transactions.length} transaksi)
               </CardDescription>
             </div>
             <Button
@@ -684,10 +705,14 @@ export default function ReportsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-semibold text-green-600 text-sm">
-                          {isIncome ? formatCurrency(transaction.amount) : "-"}
+                          {isIncome
+                            ? formatCurrency(transaction.amount)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right font-semibold text-red-600 text-sm">
-                          {!isIncome ? formatCurrency(transaction.amount) : "-"}
+                          {!isIncome
+                            ? formatCurrency(transaction.amount)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right font-bold text-sm bg-blue-50">
                           {formatCurrency(rb)}

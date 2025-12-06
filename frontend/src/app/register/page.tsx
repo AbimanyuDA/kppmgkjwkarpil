@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// ...existing code...
+import api from "@/lib/api";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -37,10 +37,11 @@ export default function RegisterPage() {
     setSuccess("");
 
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const response = await api.post("/auth/register", {
+        name,
+        email,
+        password,
+        role,
       });
 
       setSuccess(`User ${email} berhasil dibuat! Silakan login.`);
@@ -132,9 +133,7 @@ export default function RegisterPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin (Bendahara)</SelectItem>
-                    <SelectItem value="member">
-                      Member (Anggota Perkap)
-                    </SelectItem>
+                    <SelectItem value="member">Member (Anggota Perkap)</SelectItem>
                     <SelectItem value="viewer">Viewer</SelectItem>
                   </SelectContent>
                 </Select>

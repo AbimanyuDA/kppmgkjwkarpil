@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// ...existing code...
+import api from "@/lib/api";
 import { DollarSign } from "lucide-react";
 
 type Category = {
@@ -48,26 +48,20 @@ export default function IncomePage() {
     const fetchData = async () => {
       try {
         const [fundRes, categoryRes] = await Promise.all([
-          fetch("/api/funds"),
-          fetch("/api/categories"),
+          api.get("/funds"),
+          api.get("/categories"),
         ]);
-        const fundJson = await fundRes.json();
-        const categoryJson = await categoryRes.json();
-        const fundList = fundJson.data || [];
+
+        const fundList = fundRes.data.data || [];
         setFunds(fundList);
         if (fundList.length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            fundId: prev.fundId || fundList[0].id,
-          }));
+          setFormData((prev) => ({ ...prev, fundId: prev.fundId || fundList[0].id }));
         }
-        const catList: Category[] = categoryJson.data || [];
+
+        const catList: Category[] = categoryRes.data.data || [];
         setCategories(catList);
         if (catList.length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            category: prev.category || catList[0].name,
-          }));
+          setFormData((prev) => ({ ...prev, category: prev.category || catList[0].name }));
         }
       } catch (err) {
         console.error("Failed to load data", err);
@@ -87,16 +81,14 @@ export default function IncomePage() {
         amount: parseFloat(formData.amount),
       });
 
-      await fetch("/api/income", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          amount: parseFloat(formData.amount),
-          paymentMethod: formData.paymentMethod,
-          noteUrl: "",
-        }),
+      const response = await api.post("/transactions", {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        paymentMethod: formData.paymentMethod,
+        noteUrl: "",
       });
+
+      console.log("Income created:", response.data);
       alert("Pemasukan berhasil dicatat!");
       router.push("/dashboard/transactions");
     } catch (error: any) {
@@ -210,9 +202,7 @@ export default function IncomePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cash">💵 Tunai (Cash)</SelectItem>
-                  <SelectItem value="bank">
-                    🏦 Rekening Bank (Transfer)
-                  </SelectItem>
+                  <SelectItem value="bank">🏦 Rekening Bank (Transfer)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -19,11 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// ...existing code...
+import api from "@/lib/api";
 import { Plus, RefreshCcw } from "lucide-react";
 
 interface Fund {
-  // ...existing code...
   id: string;
   name: string;
   description: string;
@@ -46,9 +45,8 @@ export default function FundsPage() {
   const loadFunds = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/funds");
-      const json = await res.json();
-      setFunds(json.data || []);
+      const res = await api.get("/funds");
+      setFunds(res.data.data || []);
     } catch (err) {
       console.error("Failed to load funds", err);
       alert("Gagal memuat fund");
@@ -66,29 +64,28 @@ export default function FundsPage() {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      alert("Nama proker/fund wajib diisi");
+      alert("Nama fund wajib diisi");
       return;
     }
     setSaving(true);
     try {
       if (form.id) {
-        await fetch("/api/funds", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: form.id, name: form.name, description: form.description, status: form.status }),
+        await api.put(`/funds/${form.id}`, {
+          name: form.name,
+          description: form.description,
+          status: form.status,
         });
       } else {
-        await fetch("/api/funds", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: form.name, description: form.description }),
+        await api.post("/funds", {
+          name: form.name,
+          description: form.description,
         });
       }
       resetForm();
       loadFunds();
     } catch (err: any) {
       console.error("Save fund error", err);
-      alert("Gagal menyimpan fund");
+      alert(err.response?.data?.error || "Gagal menyimpan fund");
     } finally {
       setSaving(false);
     }
@@ -106,15 +103,11 @@ export default function FundsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Hapus fund ini?")) return;
     try {
-      await fetch("/api/funds", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+      await api.delete(`/funds/${id}`);
       loadFunds();
     } catch (err: any) {
       console.error("Delete fund error", err);
-      alert("Gagal hapus fund");
+      alert(err.response?.data?.error || "Gagal hapus fund");
     }
   };
 
@@ -146,7 +139,7 @@ export default function FundsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Nama Proker/Fund *</Label>
+            <Label>Nama Fund *</Label>
             <Input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -158,9 +151,7 @@ export default function FundsPage() {
             <Label>Deskripsi</Label>
             <Input
               value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Keterangan singkat"
             />
           </div>
@@ -211,9 +202,7 @@ export default function FundsPage() {
               <div>
                 <div className="font-semibold flex items-center gap-2">
                   {fund.name}
-                  <Badge
-                    variant={fund.status === "active" ? "default" : "secondary"}
-                  >
+                  <Badge variant={fund.status === "active" ? "default" : "secondary"}>
                     {fund.status}
                   </Badge>
                 </div>
@@ -224,11 +213,7 @@ export default function FundsPage() {
                 )}
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(fund)}
-                >
+                <Button variant="outline" size="sm" onClick={() => handleEdit(fund)}>
                   Edit
                 </Button>
                 <Button
