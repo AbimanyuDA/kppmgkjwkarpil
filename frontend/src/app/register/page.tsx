@@ -133,7 +133,9 @@ export default function RegisterPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin (Bendahara)</SelectItem>
-                    <SelectItem value="member">Member (Anggota Perkap)</SelectItem>
+                    <SelectItem value="member">
+                      Member (Anggota Perkap)
+                    </SelectItem>
                     <SelectItem value="viewer">Viewer</SelectItem>
                   </SelectContent>
                 </Select>

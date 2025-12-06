@@ -30,7 +30,7 @@ export default function LoginPage() {
       console.log("Attempting login...");
       const response = await api.post("/auth/login", { email, password });
       console.log("Login response:", response.data);
-      
+
       const { token, user } = response.data.data;
 
       if (!token || !user) {
@@ -44,7 +44,10 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Login error:", err);
-      const errorMessage = err.response?.data?.error || err.message || "Login gagal. Silakan coba lagi.";
+      const errorMessage =
+        err.response?.data?.error ||
+        err.message ||
+        "Login gagal. Silakan coba lagi.";
       setError(errorMessage);
       setLoading(false);
     }

@@ -42,9 +42,9 @@ export default function TransferPage() {
         const res = await api.get("/funds");
         setFunds(res.data.data || []);
         if ((res.data.data || []).length > 0) {
-          setFormData((prev) => ({ 
-            ...prev, 
-            fundId: prev.fundId || res.data.data[0].id 
+          setFormData((prev) => ({
+            ...prev,
+            fundId: prev.fundId || res.data.data[0].id,
           }));
         }
       } catch (err) {
@@ -83,8 +83,11 @@ export default function TransferPage() {
       // 2. Pemasukan ke tujuan (income)
 
       const amount = parseFloat(formData.amount);
-      const description = formData.description || 
-        `Transfer dari ${formData.fromMethod === "bank" ? "Bank" : "Cash"} ke ${formData.toMethod === "bank" ? "Bank" : "Cash"}`;
+      const description =
+        formData.description ||
+        `Transfer dari ${formData.fromMethod === "bank" ? "Bank" : "Cash"} ke ${
+          formData.toMethod === "bank" ? "Bank" : "Cash"
+        }`;
 
       // Transaksi 1: Pengeluaran dari sumber
       await api.post("/transactions", {
@@ -142,7 +145,8 @@ export default function TransferPage() {
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="text-lg sm:text-xl">Form Transfer</CardTitle>
           <CardDescription className="text-sm">
-            Transfer saldo akan mencatat 2 transaksi: pengeluaran dari sumber dan pemasukan ke tujuan
+            Transfer saldo akan mencatat 2 transaksi: pengeluaran dari sumber
+            dan pemasukan ke tujuan
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -195,8 +199,8 @@ export default function TransferPage() {
                 Transfer dari{" "}
                 <span className="font-semibold">
                   {formData.fromMethod === "bank" ? "Bank" : "Cash"}
-                </span>
-                {" "}ke{" "}
+                </span>{" "}
+                ke{" "}
                 <span className="font-semibold">
                   {formData.toMethod === "bank" ? "Bank" : "Cash"}
                 </span>
@@ -299,7 +303,11 @@ export default function TransferPage() {
 
             {/* Submit */}
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              <Button type="submit" disabled={loading} className="w-full sm:flex-1">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:flex-1"
+              >
                 {loading ? "⏳ Memproses..." : "💸 Transfer Saldo"}
               </Button>
               <Button

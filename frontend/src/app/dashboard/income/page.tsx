@@ -55,13 +55,19 @@ export default function IncomePage() {
         const fundList = fundRes.data.data || [];
         setFunds(fundList);
         if (fundList.length > 0) {
-          setFormData((prev) => ({ ...prev, fundId: prev.fundId || fundList[0].id }));
+          setFormData((prev) => ({
+            ...prev,
+            fundId: prev.fundId || fundList[0].id,
+          }));
         }
 
         const catList: Category[] = categoryRes.data.data || [];
         setCategories(catList);
         if (catList.length > 0) {
-          setFormData((prev) => ({ ...prev, category: prev.category || catList[0].name }));
+          setFormData((prev) => ({
+            ...prev,
+            category: prev.category || catList[0].name,
+          }));
         }
       } catch (err) {
         console.error("Failed to load data", err);
@@ -202,7 +208,9 @@ export default function IncomePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cash">💵 Tunai (Cash)</SelectItem>
-                  <SelectItem value="bank">🏦 Rekening Bank (Transfer)</SelectItem>
+                  <SelectItem value="bank">
+                    🏦 Rekening Bank (Transfer)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

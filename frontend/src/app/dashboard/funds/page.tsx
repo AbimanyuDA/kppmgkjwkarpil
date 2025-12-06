@@ -151,7 +151,9 @@ export default function FundsPage() {
             <Label>Deskripsi</Label>
             <Input
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
               placeholder="Keterangan singkat"
             />
           </div>
@@ -202,7 +204,9 @@ export default function FundsPage() {
               <div>
                 <div className="font-semibold flex items-center gap-2">
                   {fund.name}
-                  <Badge variant={fund.status === "active" ? "default" : "secondary"}>
+                  <Badge
+                    variant={fund.status === "active" ? "default" : "secondary"}
+                  >
                     {fund.status}
                   </Badge>
                 </div>
@@ -213,7 +217,11 @@ export default function FundsPage() {
                 )}
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleEdit(fund)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEdit(fund)}
+                >
                   Edit
                 </Button>
                 <Button
