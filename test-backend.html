@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend API</title>
+</head>
+<body>
+    <h1>Test Backend Connection</h1>
+    <button onclick="testBackend()">Test Login API</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testBackend() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('https://kppmgkjwkarpil-nqhm.vercel.app/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'testadmin@gkjw.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify({
+                    status: response.status,
+                    ok: response.ok,
+                    data: data
+                }, null, 2);
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message + '\n\nThis usually means:\n' +
+                    '1. Network issue\n' +
+                    '2. CORS not configured (should not happen)\n' +
+                    '3. Backend is down\n\n' +
+                    'Full error: ' + JSON.stringify(error, null, 2);
+            }
+        }
+    </script>
+</body>
+</html>

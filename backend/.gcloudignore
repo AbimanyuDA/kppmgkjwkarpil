@@ -1,0 +1,14 @@
+# Git files
+.git
+.gitignore
+
+# Development files
+*.md
+.env
+.env.local
+tmp/
+bin/
+
+# Go files
+*.test
+*.out

@@ -1,0 +1,8 @@
+# Vercel .vercelignore
+.env
+.env.local
+tmp/
+bin/
+*.test
+*.out
+.git
