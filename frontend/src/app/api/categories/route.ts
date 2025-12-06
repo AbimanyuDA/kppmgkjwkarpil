@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     }
 
     const result = await pool.query(`
-      SELECT id, name, type, description, created_at, updated_at
+      SELECT id, name, type, created_at, updated_at
       FROM categories
       ORDER BY type, name
     `);

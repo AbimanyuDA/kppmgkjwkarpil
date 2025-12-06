@@ -13,14 +13,13 @@ export async function GET(req: NextRequest) {
     // Get expense by category for the current month
     const result = await pool.query(`
       SELECT 
-        c.name as category,
+        t.category,
         SUM(t.amount) as total
       FROM transactions t
-      LEFT JOIN categories c ON t.category_id = c.id
       WHERE t.status = 'approved'
         AND t.type = 'expense'
-        AND DATE_TRUNC('month', t.transaction_date) = DATE_TRUNC('month', CURRENT_DATE)
-      GROUP BY c.name
+        AND DATE_TRUNC('month', t.date) = DATE_TRUNC('month', CURRENT_DATE)
+      GROUP BY t.category
       ORDER BY total DESC
       LIMIT 10
     `);

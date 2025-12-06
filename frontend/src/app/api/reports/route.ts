@@ -19,11 +19,10 @@ export async function GET(req: NextRequest) {
 
     let query = `
       SELECT 
-        t.id, t.transaction_date, t.amount, t.description, t.type, t.status,
-        f.name as fund_name, c.name as category_name, u.name as creator_name
+        t.id, t.date, t.amount, t.description, t.type, t.status, t.category,
+        f.name as fund_name, u.name as creator_name
       FROM transactions t
       LEFT JOIN funds f ON t.fund_id = f.id
-      LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN users u ON t.created_by = u.id
       WHERE t.status = 'approved'
     `;
@@ -32,13 +31,13 @@ export async function GET(req: NextRequest) {
     let paramCount = 1;
 
     if (startDate) {
-      query += ` AND t.transaction_date >= $${paramCount}`;
+      query += ` AND t.date >= $${paramCount}`;
       params.push(startDate);
       paramCount++;
     }
 
     if (endDate) {
-      query += ` AND t.transaction_date <= $${paramCount}`;
+      query += ` AND t.date <= $${paramCount}`;
       params.push(endDate);
       paramCount++;
     }
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (categoryId) {
-      query += ` AND t.category_id = $${paramCount}`;
+      query += ` AND t.category = $${paramCount}`;
       params.push(categoryId);
       paramCount++;
     }
@@ -61,7 +60,7 @@ export async function GET(req: NextRequest) {
       paramCount++;
     }
 
-    query += ` ORDER BY t.transaction_date DESC`;
+    query += ` ORDER BY t.date DESC`;
 
     const result = await pool.query(query, params);
 

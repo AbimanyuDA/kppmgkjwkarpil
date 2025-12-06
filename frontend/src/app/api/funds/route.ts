@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     }
 
     const result = await pool.query(`
-      SELECT id, name, description, balance, created_at, updated_at
+      SELECT id, name, description, status, created_at, updated_at
       FROM funds
       ORDER BY name
     `);

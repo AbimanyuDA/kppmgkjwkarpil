@@ -14,15 +14,15 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { transaction_date, fund_id, category_id, amount, description, type } = body;
+    const { date, fund_id, category, amount, description, type, event_name, payment_method } = body;
 
     const result = await pool.query(
       `UPDATE transactions 
-       SET transaction_date = $1, fund_id = $2, category_id = $3, 
-           amount = $4, description = $5, type = $6, updated_at = NOW()
-       WHERE id = $7 
+       SET date = $1, fund_id = $2, category = $3, 
+           amount = $4, description = $5, type = $6, event_name = $7, payment_method = $8, updated_at = NOW()
+       WHERE id = $9 
        RETURNING *`,
-      [transaction_date, fund_id, category_id, amount, description, type, params.id]
+      [date, fund_id, category, amount, description, type, event_name, payment_method, params.id]
     );
 
     if (result.rows.length === 0) {
