@@ -7,9 +7,20 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: 10,
+  min: 2,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,
+  allowExitOnIdle: true,
+});
+
+// Test connection on startup
+pool.on('error', (err) => {
+  console.error('Database pool error:', err);
+});
+
+pool.on('connect', () => {
+  console.log('Database connected successfully');
 });
 
 export default pool;
