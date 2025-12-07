@@ -18,7 +18,7 @@ func GetFunds(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, funds)
+	c.JSON(http.StatusOK, gin.H{"data": funds})
 }
 
 // CreateFund membuat dana baru (Admin only)

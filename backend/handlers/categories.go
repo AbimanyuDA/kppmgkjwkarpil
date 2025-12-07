@@ -18,7 +18,7 @@ func GetCategories(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, categories)
+	c.JSON(http.StatusOK, gin.H{"data": categories})
 }
 
 // CreateCategory membuat kategori baru (Admin only)

@@ -26,6 +26,25 @@ CREATE TABLE IF NOT EXISTS transactions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create funds table
+CREATE TABLE IF NOT EXISTS funds (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create categories table
+CREATE TABLE IF NOT EXISTS categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type VARCHAR(50) NOT NULL DEFAULT 'general' CHECK (type IN ('income', 'expense', 'general')),
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create activity_logs table
 CREATE TABLE IF NOT EXISTS activity_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -35,6 +54,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 );
 
 -- Create indexes for better performance
+CREATE INDEX idx_categories_type_name ON categories(type, name);
 CREATE INDEX idx_transactions_created_by ON transactions(created_by);
 CREATE INDEX idx_transactions_status ON transactions(status);
 CREATE INDEX idx_transactions_date ON transactions(date);

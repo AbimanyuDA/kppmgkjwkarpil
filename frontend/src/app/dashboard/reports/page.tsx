@@ -675,14 +675,14 @@ export default function ReportsPage() {
                         <TableCell className="max-w-[200px]">
                           <div
                             className="text-sm truncate"
-                            title={transaction.description}
+                            title={transaction.eventName}
                           >
-                            {transaction.description || "-"}
+                            {transaction.eventName || "-"}
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="text-xs">
-                            {transaction.eventName || "-"}
+                            {transaction.fund?.name || "-"}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -797,15 +797,15 @@ export default function ReportsPage() {
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <div className="text-sm">
-                        {transaction.description || "-"}
+                      {/* Event Name (Keterangan) */}
+                      <div className="text-sm font-medium">
+                        {transaction.eventName || "-"}
                       </div>
 
-                      {/* Event & Category */}
+                      {/* Fund/Proker & Category */}
                       <div className="flex gap-2 flex-wrap">
                         <Badge variant="secondary" className="text-xs">
-                          {transaction.eventName || "-"}
+                          {transaction.fund?.name || "-"}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
                           {transaction.category}
