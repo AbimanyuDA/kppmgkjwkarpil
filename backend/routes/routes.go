@@ -16,6 +16,14 @@ func SetupRoutes(router *gin.Engine) {
 			"version": "1.0.0",
 		})
 	})
+	
+	// Leapcell healthcheck endpoints
+	router.GET("/kaithheathcheck", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+	router.GET("/kaithhealthcheck", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
 
 	api := router.Group("/api")
 	{
