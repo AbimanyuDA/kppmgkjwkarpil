@@ -1,9 +1,6 @@
 #!/bin/sh
-# Install fonts if not exists
-if ! apk info fontconfig > /dev/null 2>&1; then
-    echo "Installing fonts..."
-    apk add --no-cache fontconfig ttf-dejavu ttf-liberation ca-certificates
-fi
+# Install fonts for PDF generation (runtime only)
+apk add --no-cache fontconfig ttf-dejavu ttf-liberation ca-certificates > /dev/null 2>&1 || true
 
-# Run the application
+# Navigate to backend and run the application
 cd backend && ./app
