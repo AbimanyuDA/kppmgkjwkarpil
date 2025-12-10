@@ -464,7 +464,8 @@ export default function ReportsPage() {
                 📊 Laporan Cashflow
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Laporan arus kas dengan saldo berjalan ({transactions.length} transaksi)
+                Laporan arus kas dengan saldo berjalan ({transactions.length}{" "}
+                transaksi)
               </CardDescription>
             </div>
             <Button
@@ -691,7 +692,8 @@ export default function ReportsPage() {
                               setSelectedDescription({
                                 eventName: transaction.eventName,
                                 description:
-                                  transaction.description || "Tidak ada deskripsi",
+                                  transaction.description ||
+                                  "Tidak ada deskripsi",
                               })
                             }
                             className="text-sm truncate text-blue-600 hover:underline cursor-pointer"
@@ -725,14 +727,10 @@ export default function ReportsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-semibold text-green-600 text-sm">
-                          {isIncome
-                            ? formatCurrency(transaction.amount)
-                            : "-"}
+                          {isIncome ? formatCurrency(transaction.amount) : "-"}
                         </TableCell>
                         <TableCell className="text-right font-semibold text-red-600 text-sm">
-                          {!isIncome
-                            ? formatCurrency(transaction.amount)
-                            : "-"}
+                          {!isIncome ? formatCurrency(transaction.amount) : "-"}
                         </TableCell>
                         <TableCell className="text-right font-bold text-sm bg-blue-50">
                           {formatCurrency(rb)}

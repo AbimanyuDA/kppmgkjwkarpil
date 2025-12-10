@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"gkjw-finance-backend/config"
 	"gkjw-finance-backend/models"
 	"net/http"
@@ -108,14 +109,31 @@ func GetCategoryData(c *gin.Context) {
 	// Get current month start
 	startOfMonth := time.Now().AddDate(0, 0, -time.Now().Day()+1)
 
-	// Get total expense for the month
-	var totalExpense float64
-	config.DB.Model(&models.Transaction{}).
-		Where("type = ? AND status = ? AND date >= ?", "expense", "approved", startOfMonth).
-		Select("COALESCE(SUM(amount), 0)").
-		Scan(&totalExpense)
+	// Get type from query parameter (default: expense)
+	transactionType := c.DefaultQuery("type", "expense")
 
-	// Get expense by category
+	// Debug log - print what we're querying
+	fmt.Printf("=== GetCategoryData Debug ===\n")
+	fmt.Printf("Type requested: %s\n", transactionType)
+	fmt.Printf("Start of month: %s\n", startOfMonth.Format("2006-01-02"))
+
+	// Check total count by type
+	var totalIncomeCount, totalExpenseCount int64
+	config.DB.Model(&models.Transaction{}).Where("status = ?", "approved").Where("type = ?", "income").Count(&totalIncomeCount)
+	config.DB.Model(&models.Transaction{}).Where("status = ?", "approved").Where("type = ?", "expense").Count(&totalExpenseCount)
+	fmt.Printf("Total approved income count: %d\n", totalIncomeCount)
+	fmt.Printf("Total approved expense count: %d\n", totalExpenseCount)
+
+	// Get total for the month
+	var totalAmount float64
+	config.DB.Model(&models.Transaction{}).
+		Where("type = ? AND status = ? AND date >= ?", transactionType, "approved", startOfMonth).
+		Select("COALESCE(SUM(amount), 0)").
+		Scan(&totalAmount)
+
+	fmt.Printf("Total %s amount this month: %f\n", transactionType, totalAmount)
+
+	// Get by category
 	type CategorySum struct {
 		Category string
 		Amount   float64
@@ -124,16 +142,20 @@ func GetCategoryData(c *gin.Context) {
 	var categorySums []CategorySum
 	config.DB.Model(&models.Transaction{}).
 		Select("category, COALESCE(SUM(amount), 0) as amount").
-		Where("type = ? AND status = ? AND date >= ?", "expense", "approved", startOfMonth).
+		Where("type = ? AND status = ? AND date >= ?", transactionType, "approved", startOfMonth).
 		Group("category").
 		Scan(&categorySums)
+
+	fmt.Printf("Found %d categories for %s\n", len(categorySums), transactionType)
 
 	// Calculate percentages
 	for _, cs := range categorySums {
 		percentage := 0.0
-		if totalExpense > 0 {
-			percentage = (cs.Amount / totalExpense) * 100
+		if totalAmount > 0 {
+			percentage = (cs.Amount / totalAmount) * 100
 		}
+
+		fmt.Printf("  Category: %s, Amount: %f, Percentage: %f%%\n", cs.Category, cs.Amount, percentage)
 
 		categoryData = append(categoryData, CategoryData{
 			Category:   cs.Category,
