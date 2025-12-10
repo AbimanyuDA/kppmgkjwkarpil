@@ -26,7 +26,6 @@ yarn-error.log*
 backend/bin/
 backend/*.exe
 backend/*.test
-backend/go.sum
 
 # Database
 *.sqlite
