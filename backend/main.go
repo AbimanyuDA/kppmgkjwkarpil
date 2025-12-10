@@ -19,6 +19,11 @@ func main() {
 	// Initialize database connection
 	config.InitDB()
 
+	// Create uploads directory if it doesn't exist
+	if err := os.MkdirAll("./uploads", 0755); err != nil {
+		log.Printf("Warning: Failed to create uploads directory: %v", err)
+	}
+
 	// Create Gin router
 	router := gin.Default()
 

@@ -109,13 +109,13 @@ func ExportPDF(c *gin.Context) {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 	pdf.AddPage()
 
-	// Title
-	pdf.SetFont("Arial", "B", 16)
+	// Use built-in font for better compatibility
+	pdf.SetFont("Helvetica", "B", 16)
 	pdf.Cell(0, 10, "LAPORAN KEUANGAN GKJW KARANGPILANG")
 	pdf.Ln(8)
 
 	// Period
-	pdf.SetFont("Arial", "", 10)
+	pdf.SetFont("Helvetica", "", 10)
 	periodText := "Periode: "
 	if c.Query("startDate") != "" {
 		periodText += c.Query("startDate")
@@ -132,14 +132,14 @@ func ExportPDF(c *gin.Context) {
 	pdf.Ln(8)
 
 	// Summary
-	pdf.SetFont("Arial", "B", 11)
+	pdf.SetFont("Helvetica", "B", 11)
 	pdf.Cell(70, 7, fmt.Sprintf("Total Pemasukan: Rp %.0f", totalIncome))
 	pdf.Cell(70, 7, fmt.Sprintf("Total Pengeluaran: Rp %.0f", totalExpense))
 	pdf.Cell(70, 7, fmt.Sprintf("Saldo: Rp %.0f", totalIncome-totalExpense))
 	pdf.Ln(10)
 
 	// Table Header
-	pdf.SetFont("Arial", "B", 9)
+	pdf.SetFont("Helvetica", "B", 9)
 	pdf.SetFillColor(59, 130, 246)
 	pdf.SetTextColor(255, 255, 255)
 	pdf.CellFormat(25, 8, "Tanggal", "1", 0, "C", true, 0, "")
@@ -151,7 +151,7 @@ func ExportPDF(c *gin.Context) {
 	pdf.CellFormat(35, 8, "Saldo", "1", 1, "C", true, 0, "")
 
 	// Table Body - Cashflow format
-	pdf.SetFont("Arial", "", 8)
+	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(0, 0, 0)
 	fill := false
 	runningBalance := 0.0
@@ -189,7 +189,7 @@ func ExportPDF(c *gin.Context) {
 	}
 
 	// Total Row
-	pdf.SetFont("Arial", "B", 9)
+	pdf.SetFont("Helvetica", "B", 9)
 	pdf.SetFillColor(59, 130, 246)
 	pdf.SetTextColor(255, 255, 255)
 	pdf.CellFormat(145, 8, "TOTAL", "1", 0, "R", true, 0, "")
