@@ -8,6 +8,15 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine) {
+	// Health check endpoint
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "GKJW Finance Backend API is running",
+			"version": "1.0.0",
+		})
+	})
+
 	api := router.Group("/api")
 	{
 		// Public routes
