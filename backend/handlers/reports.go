@@ -202,7 +202,8 @@ func ExportPDF(c *gin.Context) {
 	filepath := "./uploads/" + filename
 
 	if err := pdf.OutputFileAndClose(filepath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate PDF"})
+		fmt.Printf("PDF generation error: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate PDF", "details": err.Error()})
 		return
 	}
 
@@ -405,7 +406,8 @@ func ExportExcel(c *gin.Context) {
 	filepath := "./uploads/" + filename
 
 	if err := f.SaveAs(filepath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate Excel file"})
+		fmt.Printf("Excel generation error: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate Excel file", "details": err.Error()})
 		return
 	}
 
