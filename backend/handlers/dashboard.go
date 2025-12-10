@@ -106,16 +106,32 @@ func GetMonthlyData(c *gin.Context) {
 func GetCategoryData(c *gin.Context) {
 	var categoryData []CategoryData
 
-	// Get current month start
-	startOfMonth := time.Now().AddDate(0, 0, -time.Now().Day()+1)
-
 	// Get type from query parameter (default: expense)
 	transactionType := c.DefaultQuery("type", "expense")
+
+	// Get period from query parameter (default: current month)
+	// Options: "month" (current month), "all" (all time), "6months" (last 6 months)
+	period := c.DefaultQuery("period", "month")
+
+	var startDate time.Time
+	if period == "all" {
+		startDate = time.Time{} // Beginning of time
+	} else if period == "6months" {
+		startDate = time.Now().AddDate(0, -6, 0)
+	} else {
+		// Default: current month
+		startDate = time.Now().AddDate(0, 0, -time.Now().Day()+1)
+	}
 
 	// Debug log - print what we're querying
 	fmt.Printf("=== GetCategoryData Debug ===\n")
 	fmt.Printf("Type requested: %s\n", transactionType)
-	fmt.Printf("Start of month: %s\n", startOfMonth.Format("2006-01-02"))
+	fmt.Printf("Period: %s\n", period)
+	if !startDate.IsZero() {
+		fmt.Printf("Start date: %s\n", startDate.Format("2006-01-02"))
+	} else {
+		fmt.Printf("Start date: all time\n")
+	}
 
 	// Check total count by type
 	var totalIncomeCount, totalExpenseCount int64
@@ -124,14 +140,19 @@ func GetCategoryData(c *gin.Context) {
 	fmt.Printf("Total approved income count: %d\n", totalIncomeCount)
 	fmt.Printf("Total approved expense count: %d\n", totalExpenseCount)
 
-	// Get total for the month
-	var totalAmount float64
-	config.DB.Model(&models.Transaction{}).
-		Where("type = ? AND status = ? AND date >= ?", transactionType, "approved", startOfMonth).
-		Select("COALESCE(SUM(amount), 0)").
-		Scan(&totalAmount)
+	// Build query
+	query := config.DB.Model(&models.Transaction{}).
+		Where("type = ? AND status = ?", transactionType, "approved")
+	
+	if !startDate.IsZero() {
+		query = query.Where("date >= ?", startDate)
+	}
 
-	fmt.Printf("Total %s amount this month: %f\n", transactionType, totalAmount)
+	// Get total for the period
+	var totalAmount float64
+	query.Select("COALESCE(SUM(amount), 0)").Scan(&totalAmount)
+
+	fmt.Printf("Total %s amount for period: %f\n", transactionType, totalAmount)
 
 	// Get by category
 	type CategorySum struct {
@@ -140,11 +161,15 @@ func GetCategoryData(c *gin.Context) {
 	}
 
 	var categorySums []CategorySum
-	config.DB.Model(&models.Transaction{}).
+	categoryQuery := config.DB.Model(&models.Transaction{}).
 		Select("category, COALESCE(SUM(amount), 0) as amount").
-		Where("type = ? AND status = ? AND date >= ?", transactionType, "approved", startOfMonth).
-		Group("category").
-		Scan(&categorySums)
+		Where("type = ? AND status = ?", transactionType, "approved")
+	
+	if !startDate.IsZero() {
+		categoryQuery = categoryQuery.Where("date >= ?", startDate)
+	}
+	
+	categoryQuery.Group("category").Scan(&categorySums)
 
 	fmt.Printf("Found %d categories for %s\n", len(categorySums), transactionType)
 

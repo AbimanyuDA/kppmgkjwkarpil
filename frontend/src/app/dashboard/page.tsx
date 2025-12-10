@@ -60,8 +60,8 @@ export default function DashboardPage() {
       const [statsRes, monthlyRes, expenseCategoryRes, incomeCategoryRes] = await Promise.all([
         api.get("/dashboard/stats"),
         api.get("/dashboard/monthly"),
-        api.get("/dashboard/category?type=expense"),
-        api.get("/dashboard/category?type=income"),
+        api.get("/dashboard/category?type=expense&period=month"),
+        api.get("/dashboard/category?type=income&period=all"),
       ]);
 
       console.log("Income category response:", incomeCategoryRes.data);
@@ -242,7 +242,7 @@ export default function DashboardPage() {
       <Card className="border-0 shadow-md">
         <CardHeader>
           <CardTitle className="text-lg font-bold">Pemasukan per Kategori</CardTitle>
-          <CardDescription>Bulan ini</CardDescription>
+          <CardDescription>Semua waktu</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
