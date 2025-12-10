@@ -21,7 +21,7 @@ RUN apk add --no-cache ca-certificates tzdata fontconfig ttf-dejavu ttf-liberati
 WORKDIR /app
 
 # Copy binary from build stage
-COPY --from=build /app/app .
+COPY --from=build /app/app /app/app
 
 # Create uploads directory for temporary files
 RUN mkdir -p /app/uploads && chmod 777 /app/uploads
@@ -30,4 +30,4 @@ RUN mkdir -p /app/uploads && chmod 777 /app/uploads
 EXPOSE 8080
 
 # Run the application
-CMD ["sh", "-c", "./app"]
+CMD ["/app/app"]
