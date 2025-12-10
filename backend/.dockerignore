@@ -1,0 +1,15 @@
+# Ignore unnecessary files for Docker build
+uploads/*
+!uploads/.gitkeep
+*.env
+.env.local
+.env.production
+.git
+.gitignore
+README.md
+*.md
+.vscode
+.idea
+bin/*
+tmp/*
+*.log
