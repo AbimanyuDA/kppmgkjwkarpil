@@ -1,0 +1,6 @@
+{
+  "root": "backend",
+  "build": "go build -o bin/app .",
+  "start": "./bin/app",
+  "port": 8080
+}

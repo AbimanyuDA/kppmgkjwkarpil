@@ -310,9 +310,9 @@ func ExportExcel(c *gin.Context) {
 	})
 	f.SetCellStyle(sheetName, "B5", "B7", numberStyle)
 
-	// Table Headers - Cashflow format
+	// Table Headers - Cashflow format with Description
 	row := 9
-	headers := []string{"Tanggal", "Kegiatan", "Kategori", "Pemasukan", "Pengeluaran", "Saldo Akhir"}
+	headers := []string{"Tanggal", "Kegiatan", "Deskripsi", "Kategori", "Pemasukan", "Pengeluaran", "Saldo Akhir"}
 	for col, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(col+1, row)
 		f.SetCellValue(sheetName, cell, header)
@@ -332,7 +332,7 @@ func ExportExcel(c *gin.Context) {
 			{Type: "right", Color: "000000", Style: 1},
 		},
 	})
-	f.SetCellStyle(sheetName, "A9", "F9", headerStyle)
+	f.SetCellStyle(sheetName, "A9", "G9", headerStyle)
 
 	// Data Rows - Cashflow format
 	row = 10
@@ -347,32 +347,33 @@ func ExportExcel(c *gin.Context) {
 
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), tx.Date.Format("02/01/2006"))
 		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), tx.EventName)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), tx.Category)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), tx.Description)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), tx.Category)
 		
 		// Pemasukan column
 		if tx.Type == "income" {
-			f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), tx.Amount)
-		} else {
-			f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), "-")
-		}
-		
-		// Pengeluaran column
-		if tx.Type == "expense" {
 			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), tx.Amount)
 		} else {
 			f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), "-")
 		}
 		
+		// Pengeluaran column
+		if tx.Type == "expense" {
+			f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), tx.Amount)
+		} else {
+			f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), "-")
+		}
+		
 		// Saldo column
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), runningBalance)
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), runningBalance)
 		row++
 	}
 
 	// Apply number format to amount columns
 	if len(transactions) > 0 {
-		f.SetCellStyle(sheetName, "D10", fmt.Sprintf("D%d", row-1), numberStyle)
 		f.SetCellStyle(sheetName, "E10", fmt.Sprintf("E%d", row-1), numberStyle)
 		f.SetCellStyle(sheetName, "F10", fmt.Sprintf("F%d", row-1), numberStyle)
+		f.SetCellStyle(sheetName, "G10", fmt.Sprintf("G%d", row-1), numberStyle)
 	}
 
 	// Total Row
@@ -385,11 +386,11 @@ func ExportExcel(c *gin.Context) {
 	})
 	
 	f.SetCellValue(sheetName, fmt.Sprintf("A%d", totalRow), "TOTAL")
-	f.MergeCell(sheetName, fmt.Sprintf("A%d", totalRow), fmt.Sprintf("C%d", totalRow))
-	f.SetCellValue(sheetName, fmt.Sprintf("D%d", totalRow), totalIncome)
-	f.SetCellValue(sheetName, fmt.Sprintf("E%d", totalRow), totalExpense)
-	f.SetCellValue(sheetName, fmt.Sprintf("F%d", totalRow), totalIncome-totalExpense)
-	f.SetCellStyle(sheetName, fmt.Sprintf("A%d", totalRow), fmt.Sprintf("F%d", totalRow), totalStyle)
+	f.MergeCell(sheetName, fmt.Sprintf("A%d", totalRow), fmt.Sprintf("D%d", totalRow))
+	f.SetCellValue(sheetName, fmt.Sprintf("E%d", totalRow), totalIncome)
+	f.SetCellValue(sheetName, fmt.Sprintf("F%d", totalRow), totalExpense)
+	f.SetCellValue(sheetName, fmt.Sprintf("G%d", totalRow), totalIncome-totalExpense)
+	f.SetCellStyle(sheetName, fmt.Sprintf("A%d", totalRow), fmt.Sprintf("G%d", totalRow), totalStyle)
 
 	// Set column widths
 	f.SetColWidth(sheetName, "A", "A", 12)

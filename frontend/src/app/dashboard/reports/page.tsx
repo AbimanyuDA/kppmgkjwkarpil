@@ -21,6 +21,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -57,6 +64,12 @@ export default function ReportsPage() {
 
   // Filter visibility toggle
   const [showFilters, setShowFilters] = useState(false);
+
+  // Modal state untuk detail description
+  const [selectedDescription, setSelectedDescription] = useState<{
+    eventName: string;
+    description: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchFunds = async () => {
@@ -649,7 +662,7 @@ export default function ReportsPage() {
               <TableHeader className="bg-gray-50">
                 <TableRow>
                   <TableHead>Tanggal</TableHead>
-                  <TableHead>Keterangan</TableHead>
+                  <TableHead>Nama Kegiatan</TableHead>
                   <TableHead>Event</TableHead>
                   <TableHead>Kategori</TableHead>
                   <TableHead>Metode</TableHead>
@@ -673,12 +686,19 @@ export default function ReportsPage() {
                           {formatDate(transaction.date)}
                         </TableCell>
                         <TableCell className="max-w-[200px]">
-                          <div
-                            className="text-sm truncate"
-                            title={transaction.eventName}
+                          <button
+                            onClick={() =>
+                              setSelectedDescription({
+                                eventName: transaction.eventName,
+                                description:
+                                  transaction.description || "Tidak ada deskripsi",
+                              })
+                            }
+                            className="text-sm truncate text-blue-600 hover:underline cursor-pointer"
+                            title="Klik untuk melihat deskripsi lengkap"
                           >
                             {transaction.eventName || "-"}
-                          </div>
+                          </button>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="text-xs">
@@ -797,10 +817,19 @@ export default function ReportsPage() {
                         </div>
                       </div>
 
-                      {/* Event Name (Keterangan) */}
-                      <div className="text-sm font-medium">
-                        {transaction.eventName || "-"}
-                      </div>
+                      {/* Event Name (Keterangan) - Clickable */}
+                      <button
+                        onClick={() =>
+                          setSelectedDescription({
+                            eventName: transaction.eventName,
+                            description:
+                              transaction.description || "Tidak ada deskripsi",
+                          })
+                        }
+                        className="text-sm font-medium text-blue-600 hover:underline cursor-pointer text-left"
+                      >
+                        {transaction.eventName || "-"} 📖
+                      </button>
 
                       {/* Fund/Proker & Category */}
                       <div className="flex gap-2 flex-wrap">
@@ -957,6 +986,54 @@ export default function ReportsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal untuk menampilkan detail description */}
+      <Dialog
+        open={!!selectedDescription}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDescription(null);
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>📝 Deskripsi Lengkap</DialogTitle>
+            <DialogDescription>
+              Nama Kegiatan: {selectedDescription?.eventName}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <p className="text-sm font-medium text-gray-600 mb-2">
+                Deskripsi:
+              </p>
+              <p className="text-base text-gray-800 whitespace-pre-wrap break-words">
+                {selectedDescription?.description}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedDescription(null)}
+              >
+                Tutup
+              </Button>
+              <Button
+                onClick={() => {
+                  // Copy to clipboard
+                  if (selectedDescription?.description) {
+                    navigator.clipboard.writeText(
+                      selectedDescription.description
+                    );
+                    alert("Deskripsi disalin ke clipboard");
+                  }
+                }}
+              >
+                📋 Salin Deskripsi
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
