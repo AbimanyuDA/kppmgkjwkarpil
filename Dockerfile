@@ -13,11 +13,11 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates tzdata fontconfig ttf-dejavu ttf-liberation
 
 WORKDIR /app
-COPY --from=build /app/backend/app .
+COPY --from=build /app/backend/app ./app
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chmod 777 /app/uploads
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "./app"]
+CMD ["/app/app"]
