@@ -69,7 +69,7 @@ export default function DashboardPage() {
           publicApi.get("/dashboard/stats"),
           publicApi.get("/dashboard/monthly"),
           publicApi.get("/dashboard/category?type=expense&period=month"),
-          publicApi.get("/dashboard/category?type=income&period=all"),
+          publicApi.get("/dashboard/category?type=income&period=month"),
         ]);
 
       console.log("Income category response:", incomeCategoryRes.data);
