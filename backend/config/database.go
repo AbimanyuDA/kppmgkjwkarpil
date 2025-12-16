@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"gkjw-finance-backend/models"
 	"log"
 	"os"
 
@@ -29,7 +28,7 @@ func InitDB() {
 		host, port, user, password, dbname)
 
 	var err error
-	// Use Silent logger for production to speed up startup
+	// Use Silent logger to suppress slow query warnings
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -37,41 +36,10 @@ func InitDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Auto migrate models - run in background to avoid blocking startup
-	go func() {
-		if err := DB.AutoMigrate(&models.User{}, &models.Fund{}, &models.Category{}, &models.Transaction{}, &models.ActivityLog{}); err != nil {
-			log.Println("Warning: Failed to auto-migrate database:", err)
-		}
-	}()
+	// Database is already initialized in production.
+	// Do NOT run AutoMigrate - it causes slow queries and timeouts.
+	// Tables are pre-created and managed separately.
+	// Only run AutoMigrate in development via separate cmd tool.
 
-	// Ensure a default fund exists and backfill legacy transactions
-	// Run asynchronously to avoid blocking startup
-	go func() {
-		var defaultFund models.Fund
-		if err := DB.Where("name = ?", "Default Fund").First(&defaultFund).Error; err != nil {
-			defaultFund = models.Fund{
-				Name:        "Default Fund",
-				Description: "Fund created automatically for legacy transactions",
-				Status:      "active",
-			}
-			if err := DB.Create(&defaultFund).Error; err != nil {
-				log.Println("Warning: Failed to create default fund:", err)
-				return
-			}
-		}
-
-		if err := DB.Model(&models.Transaction{}).
-			Where("fund_id IS NULL").
-			Update("fund_id", defaultFund.ID).Error; err != nil {
-			log.Println("Warning: Failed to backfill transactions fund_id:", err)
-		}
-
-		if err := DB.Model(&models.Transaction{}).
-			Where("payment_method IS NULL OR payment_method = ''").
-			Update("payment_method", "cash").Error; err != nil {
-			log.Println("Warning: Failed to backfill payment_method:", err)
-		}
-	}()
-
-	log.Println("Database connected and migrated successfully")
+	log.Println("Database connected successfully")
 }

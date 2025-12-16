@@ -13,7 +13,8 @@ import (
 func main() {
 	// Load environment variables from .env file if exists (for local development)
 	// For production (Leapcell), environment variables are set directly
-	godotenv.Load() // Silently fails if .env doesn't exist
+	godotenv.Load()              // Load .env
+	godotenv.Load(".env.local")  // Override with .env.local if exists (for local development)
 
 	// Initialize database connection (reads from environment variables)
 	config.InitDB()
