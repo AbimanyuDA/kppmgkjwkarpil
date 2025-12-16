@@ -27,6 +27,45 @@ type UpdateTransactionStatusRequest struct {
 	RejectionReason string `json:"rejectionReason"`
 }
 
+// GetApprovedTransactions returns only approved transactions (public endpoint for guests)
+func GetApprovedTransactions(c *gin.Context) {
+	var transactions []models.Transaction
+
+	query := config.DB.Preload("CreatedByUser").Preload("Fund").
+		Where("status = ?", "approved").
+		Order("created_at DESC")
+
+	// Filter by type
+	if txType := c.Query("type"); txType != "" {
+		query = query.Where("type = ?", txType)
+	}
+
+	// Filter by payment method
+	if pm := c.Query("paymentMethod"); pm != "" {
+		query = query.Where("payment_method = ?", pm)
+	}
+
+	// Filter by date range
+	if startDate := c.Query("startDate"); startDate != "" {
+		query = query.Where("date >= ?", startDate)
+	}
+	if endDate := c.Query("endDate"); endDate != "" {
+		query = query.Where("date <= ?", endDate)
+	}
+
+	// Filter by fund
+	if fundID := c.Query("fundId"); fundID != "" {
+		query = query.Where("fund_id = ?", fundID)
+	}
+
+	if err := query.Find(&transactions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": transactions})
+}
+
 func GetTransactions(c *gin.Context) {
 	var transactions []models.Transaction
 

@@ -42,7 +42,8 @@ func SetupRoutes(router *gin.Engine) {
 	}
 
 	// Public Transactions endpoint (GET only)
-	router.GET("/api/transactions", handlers.GetTransactions)
+	// Public Transactions endpoint (GET only - approved transactions)
+	router.GET("/api/transactions", handlers.GetApprovedTransactions)
 
 	// Public Reports endpoints
 	reports := router.Group("/api/reports")
@@ -78,6 +79,7 @@ func SetupRoutes(router *gin.Engine) {
 		// Transactions (protected operations)
 		transactions := api.Group("/transactions")
 		{
+			transactions.GET("", handlers.GetTransactions) // Protected - shows user's transactions
 			transactions.GET("/:id", handlers.GetTransactionByID)
 			transactions.POST("", handlers.CreateTransaction)
 			transactions.PUT("/:id", handlers.UpdateTransaction)
