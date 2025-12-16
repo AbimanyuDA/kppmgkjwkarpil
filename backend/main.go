@@ -11,12 +11,11 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
+	// Load environment variables from .env file if exists (for local development)
+	// For production (Leapcell), environment variables are set directly
+	godotenv.Load() // Silently fails if .env doesn't exist
 
-	// Initialize database connection
+	// Initialize database connection (reads from environment variables)
 	config.InitDB()
 
 	// Create uploads directory if it doesn't exist
