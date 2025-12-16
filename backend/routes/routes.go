@@ -41,9 +41,14 @@ func SetupRoutes(router *gin.Engine) {
 		dashboard.GET("/category", handlers.GetCategoryData)
 	}
 
-	// Public Transactions endpoint (GET only)
 	// Public Transactions endpoint (GET only - approved transactions)
 	router.GET("/api/transactions", handlers.GetApprovedTransactions)
+
+	// Public Categories endpoint (GET only - for form dropdowns)
+	router.GET("/api/categories", handlers.GetCategories)
+
+	// Public Funds endpoint (GET only - for form dropdowns)
+	router.GET("/api/funds", handlers.GetFunds)
 
 	// Public Reports endpoints
 	reports := router.Group("/api/reports")
@@ -57,10 +62,9 @@ func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
-		// Categories (protected)
+		// Categories (protected - write operations only)
 		categories := api.Group("/categories")
 		{
-			categories.GET("", handlers.GetCategories)
 			adminCategories := categories.Group("")
 			adminCategories.Use(middleware.AdminOnly())
 			{
@@ -79,7 +83,6 @@ func SetupRoutes(router *gin.Engine) {
 		// Transactions (protected operations)
 		transactions := api.Group("/transactions")
 		{
-			transactions.GET("", handlers.GetTransactions) // Protected - shows user's transactions
 			transactions.GET("/:id", handlers.GetTransactionByID)
 			transactions.POST("", handlers.CreateTransaction)
 			transactions.PUT("/:id", handlers.UpdateTransaction)
@@ -98,10 +101,9 @@ func SetupRoutes(router *gin.Engine) {
 			users.DELETE("/:id", handlers.DeleteUser)
 		}
 
-		// Funds (protected)
+		// Funds (protected - write operations only)
 		funds := api.Group("/funds")
 		{
-			funds.GET("", handlers.GetFunds)
 			fundsAdmin := funds.Group("")
 			fundsAdmin.Use(middleware.AdminOnly())
 			{
