@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type User struct {
@@ -45,21 +44,7 @@ type ActivityLog struct {
 	Timestamp time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"timestamp"`
 }
 
-// BeforeCreate hook for User
-func (u *User) BeforeCreate(tx *gorm.DB) error {
-	if u.ID == uuid.Nil {
-		u.ID = uuid.New()
-	}
-	return nil
-}
 
-// BeforeCreate hook for Transaction
-func (t *Transaction) BeforeCreate(tx *gorm.DB) error {
-	if t.ID == uuid.Nil {
-		t.ID = uuid.New()
-	}
-	return nil
-}
 
 // Fund represents a project / program fund envelope
 type Fund struct {
@@ -71,13 +56,7 @@ type Fund struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
-// BeforeCreate hook for Fund
-func (f *Fund) BeforeCreate(tx *gorm.DB) error {
-	if f.ID == uuid.Nil {
-		f.ID = uuid.New()
-	}
-	return nil
-}
+
 
 // Category represents transaction category label (can be used for both income and expense)
 type Category struct {
@@ -88,18 +67,4 @@ type Category struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// BeforeCreate hook for Category
-func (c *Category) BeforeCreate(tx *gorm.DB) error {
-	if c.ID == uuid.Nil {
-		c.ID = uuid.New()
-	}
-	return nil
-}
 
-// BeforeCreate hook for ActivityLog
-func (a *ActivityLog) BeforeCreate(tx *gorm.DB) error {
-	if a.ID == uuid.Nil {
-		a.ID = uuid.New()
-	}
-	return nil
-}
