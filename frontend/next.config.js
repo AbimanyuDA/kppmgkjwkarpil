@@ -8,6 +8,17 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: ['*']
     }
+  },
+  // Rewrite /api calls to backend to prevent mixed content errors
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/api/:path*',
+          destination: 'http://34.228.26.121/api/:path*'
+        }
+      ]
+    };
   }
 };
 
