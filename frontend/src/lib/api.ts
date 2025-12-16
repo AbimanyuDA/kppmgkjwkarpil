@@ -1,7 +1,9 @@
 import axios from "axios";
 
-// Use relative path /api for production (via Vercel proxy), or env variable if set
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api";
+// In production (Vercel), always use /api to avoid mixed content errors
+// NEVER use hardcoded HTTP backend URL from env variables
+const isProduction = process.env.NODE_ENV === "production";
+const baseURL = isProduction ? "/api" : (process.env.NEXT_PUBLIC_API_URL || "/api");
 
 const api = axios.create({
   baseURL: baseURL,
