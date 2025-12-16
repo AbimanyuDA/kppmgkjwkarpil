@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// Use relative path /api for production (via Vercel proxy), or env variable if set
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api";
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -9,7 +12,7 @@ const api = axios.create({
 
 // Public API (no auto redirect on 401)
 export const publicApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },
