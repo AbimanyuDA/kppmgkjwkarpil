@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import {
   Card,
   CardContent,
@@ -29,6 +30,8 @@ type Category = {
 };
 
 export default function IncomePage() {
+  useRouteProtection();
+  
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [funds, setFunds] = useState<any[]>([]);

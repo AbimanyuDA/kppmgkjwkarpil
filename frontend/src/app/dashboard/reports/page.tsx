@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import api from "@/lib/api";
+import api, { publicApi } from "@/lib/api";
 import {
   Download,
   FileText,
@@ -74,7 +74,7 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchFunds = async () => {
       try {
-        const res = await api.get("/funds");
+        const res = await publicApi.get("/funds");
         setFunds(res.data.data || []);
       } catch (err) {
         console.error("Error fetching funds", err);
@@ -82,7 +82,7 @@ export default function ReportsPage() {
     };
     const fetchCategories = async () => {
       try {
-        const res = await api.get("/categories");
+        const res = await publicApi.get("/categories");
         setCategories(res.data.data || []);
       } catch (err) {
         console.error("Error fetching categories", err);
@@ -103,7 +103,7 @@ export default function ReportsPage() {
       if (filters.category) params.append("category", filters.category);
       if (filters.fundId) params.append("fundId", filters.fundId);
 
-      const response = await api.get(`/reports?${params.toString()}`);
+      const response = await publicApi.get(`/reports?${params.toString()}`);
       const raw = response.data.data || [];
 
       // Sort oldest->newest to compute running balance, then flip to show newest on top
@@ -151,7 +151,7 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      const response = await api.get(
+      const response = await publicApi.get(
         `/reports/export/pdf?${params.toString()}`,
         {
           responseType: "blob",
@@ -188,7 +188,7 @@ export default function ReportsPage() {
       if (filters.fundId && filters.fundId !== "all")
         params.append("fundId", filters.fundId);
 
-      const response = await api.get(
+      const response = await publicApi.get(
         `/reports/export/excel?${params.toString()}`,
         {
           responseType: "blob",

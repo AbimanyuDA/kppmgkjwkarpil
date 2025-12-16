@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -34,6 +35,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 export default function TransactionsPage() {
+  useRouteProtection();
+
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);

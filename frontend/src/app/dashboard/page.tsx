@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { BarChart } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
-import api from "@/lib/api";
+import api, { publicApi } from "@/lib/api";
 import { ArrowUpCircle, ArrowDownCircle, Wallet, Clock, TrendingUp, TrendingDown } from "lucide-react";
 
 // Format untuk grafik (tanpa Rp)
@@ -58,10 +58,10 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       const [statsRes, monthlyRes, expenseCategoryRes, incomeCategoryRes] = await Promise.all([
-        api.get("/dashboard/stats"),
-        api.get("/dashboard/monthly"),
-        api.get("/dashboard/category?type=expense&period=month"),
-        api.get("/dashboard/category?type=income&period=all"),
+        publicApi.get("/dashboard/stats"),
+        publicApi.get("/dashboard/monthly"),
+        publicApi.get("/dashboard/category?type=expense&period=month"),
+        publicApi.get("/dashboard/category?type=income&period=all"),
       ]);
 
       console.log("Income category response:", incomeCategoryRes.data);

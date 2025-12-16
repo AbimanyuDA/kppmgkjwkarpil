@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import {
   Card,
   CardContent,
@@ -32,6 +33,8 @@ interface Fund {
 }
 
 export default function FundsPage() {
+  useRouteProtection();
+
   const [funds, setFunds] = useState<Fund[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);

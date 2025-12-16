@@ -29,6 +29,9 @@ export default function DashboardLayout({ children }: SidebarProps) {
     const userData = localStorage.getItem("user");
     if (userData) {
       setUser(JSON.parse(userData));
+    } else {
+      // If no user logged in, create guest user for viewing dashboard
+      setUser({ role: "guest", name: "Guest" });
     }
   }, []);
 
@@ -39,16 +42,17 @@ export default function DashboardLayout({ children }: SidebarProps) {
   };
 
   const menuItems = [
-    { href: "/dashboard", icon: Home, label: "Dashboard" },
-    { href: "/dashboard/transactions", icon: FileText, label: "Transaksi" },
-    { href: "/dashboard/income", icon: DollarSign, label: "Input Pemasukan" },
-    { href: "/dashboard/upload", icon: Upload, label: "Input Pengeluaran" },
+    { href: "/dashboard", icon: Home, label: "Dashboard", guestOnly: false },
+    { href: "/dashboard/transactions", icon: FileText, label: "Transaksi", adminOnly: true },
+    { href: "/dashboard/income", icon: DollarSign, label: "Input Pemasukan", adminOnly: true },
+    { href: "/dashboard/upload", icon: Upload, label: "Input Pengeluaran", adminOnly: true },
     {
       href: "/dashboard/transfer",
       icon: ArrowLeftRight,
       label: "Transfer Saldo",
+      adminOnly: true,
     },
-    { href: "/dashboard/reports", icon: FileText, label: "Laporan" },
+    { href: "/dashboard/reports", icon: FileText, label: "Laporan", guestOnly: false },
     {
       href: "/dashboard/categories",
       icon: Folder,
@@ -94,6 +98,30 @@ export default function DashboardLayout({ children }: SidebarProps) {
         <nav className="flex-1 px-2 py-4">
           <ul className="space-y-2">
             {menuItems.map((item) => {
+              // Admin dapat akses semua
+              if (user?.role === "admin") {
+                const isActive = pathname === item.href;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                        isActive
+                          ? "bg-blue-700 text-white"
+                          : "text-blue-100 hover:bg-blue-800"
+                      }`}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {sidebarOpen && <span>{item.label}</span>}
+                    </Link>
+                  </li>
+                );
+              }
+
+              // Guest hanya bisa akses Dashboard dan Laporan (guestOnly: false)
+              if (user?.role === "guest" && item.adminOnly) return null;
+
+              // Member (atau role lain) - ikuti adminOnly logic
               if (item.adminOnly && user?.role !== "admin") return null;
 
               const isActive = pathname === item.href;
@@ -117,14 +145,16 @@ export default function DashboardLayout({ children }: SidebarProps) {
         </nav>
 
         <div className="p-4 border-t border-blue-800">
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full justify-start text-blue-100 hover:bg-blue-800 hover:text-white"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            {sidebarOpen && <span>Logout</span>}
-          </Button>
+          {user?.role !== "guest" && (
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="w-full justify-start text-blue-100 hover:bg-blue-800 hover:text-white"
+            >
+              <LogOut className="h-5 w-5 mr-3" />
+              {sidebarOpen && <span>Logout</span>}
+            </Button>
+          )}
         </div>
       </aside>
 

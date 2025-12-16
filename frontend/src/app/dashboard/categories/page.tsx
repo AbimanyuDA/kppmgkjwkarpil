@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import {
   Card,
   CardContent,
@@ -29,6 +30,8 @@ type Category = {
 };
 
 export default function CategoriesPage() {
+  useRouteProtection();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [editing, setEditing] = useState<{ id: string; value: string } | null>(

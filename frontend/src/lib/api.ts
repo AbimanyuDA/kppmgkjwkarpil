@@ -7,6 +7,14 @@ const api = axios.create({
   },
 });
 
+// Public API (no auto redirect on 401)
+export const publicApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 // Request interceptor untuk menambahkan token
 api.interceptors.request.use(
   (config) => {
@@ -21,7 +29,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor untuk handle errors
+// Response interceptor untuk handle errors (ONLY auto redirect on api, not publicApi)
 api.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -34,6 +34,29 @@ func SetupRoutes(router *gin.Engine) {
 			auth.POST("/register", handlers.Register)
 		}
 
+		// Public endpoints - accessible without auth
+		public := api.Group("")
+		{
+			// Dashboard stats - public access
+			dashboard := public.Group("/dashboard")
+			{
+				dashboard.GET("/stats", handlers.GetDashboardStats)
+				dashboard.GET("/monthly", handlers.GetMonthlyData)
+				dashboard.GET("/category", handlers.GetCategoryData)
+			}
+
+			// Transactions - public access
+			public.GET("/transactions", handlers.GetTransactions)
+
+			// Reports - public access
+			reports := public.Group("/reports")
+			{
+				reports.GET("", handlers.GetReports)
+				reports.GET("/export/pdf", handlers.ExportPDF)
+				reports.GET("/export/excel", handlers.ExportExcel)
+			}
+		}
+
 		// Protected routes
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
@@ -54,28 +77,17 @@ func SetupRoutes(router *gin.Engine) {
 			// Dashboard
 			dashboard := protected.Group("/dashboard")
 			{
-				dashboard.GET("/stats", handlers.GetDashboardStats)
-				dashboard.GET("/monthly", handlers.GetMonthlyData)
-				dashboard.GET("/category", handlers.GetCategoryData)
+				dashboard.POST("", handlers.CreateTransaction) // Keep POST for protected, GET is public
 			}
 
 			// Transactions
 			transactions := protected.Group("/transactions")
 			{
-				transactions.GET("", handlers.GetTransactions)
 				transactions.GET("/:id", handlers.GetTransactionByID)
 				transactions.POST("", handlers.CreateTransaction)
 				transactions.PUT("/:id", handlers.UpdateTransaction)
 				transactions.PUT("/:id/status", handlers.UpdateTransactionStatus)
 				transactions.DELETE("/:id", middleware.AdminOnly(), handlers.DeleteTransaction)
-			}
-
-			// Reports
-			reports := protected.Group("/reports")
-			{
-				reports.GET("", handlers.GetReports)
-				reports.GET("/export/pdf", handlers.ExportPDF)
-				reports.GET("/export/excel", handlers.ExportExcel)
 			}
 
 			// Users (Admin only)

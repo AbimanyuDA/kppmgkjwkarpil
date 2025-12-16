@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import {
   Card,
   CardContent,
@@ -24,6 +25,8 @@ import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import api from "@/lib/api";
 
 export default function TransferPage() {
+  useRouteProtection();
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [funds, setFunds] = useState<any[]>([]);

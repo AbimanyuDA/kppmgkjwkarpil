@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouteProtection } from "@/lib/useRouteProtection";
 import {
   Card,
   CardContent,
@@ -39,6 +40,8 @@ import api from "@/lib/api";
 import { UserPlus, Pencil, Trash2 } from "lucide-react";
 
 export default function UsersPage() {
+  useRouteProtection();
+
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
