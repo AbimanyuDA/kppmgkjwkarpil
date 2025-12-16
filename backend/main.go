@@ -41,6 +41,11 @@ func main() {
 		c.Next()
 	})
 
+	// Quick health check endpoint (responds immediately before migrations complete)
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
+
 	// Setup routes
 	routes.SetupRoutes(router)
 
