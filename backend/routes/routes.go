@@ -27,27 +27,29 @@ func SetupRoutes(router *gin.Engine) {
 
 	api := router.Group("/api")
 	{
-		// Public routes - Auth endpoints
+		// ============ PUBLIC ROUTES (NO MIDDLEWARE) ============
+		
+		// Auth endpoints
 		auth := api.Group("/auth")
 		{
 			auth.POST("/login", handlers.Login)
 			auth.POST("/register", handlers.Register)
 		}
 
-		// Public endpoints - NO middleware
+		// Public dashboard endpoints
 		api.GET("/dashboard/stats", handlers.GetDashboardStats)
 		api.GET("/dashboard/monthly", handlers.GetMonthlyData)
 		api.GET("/dashboard/category", handlers.GetCategoryData)
+		
+		// Public transaction list
 		api.GET("/transactions", handlers.GetTransactions)
 		
-		reports := api.Group("/reports")
-		{
-			reports.GET("", handlers.GetReports)
-			reports.GET("/export/pdf", handlers.ExportPDF)
-			reports.GET("/export/excel", handlers.ExportExcel)
-		}
+		// Public reports
+		api.GET("/reports", handlers.GetReports)
+		api.GET("/reports/export/pdf", handlers.ExportPDF)
+		api.GET("/reports/export/excel", handlers.ExportExcel)
 
-		// Protected routes - WITH middleware
+		// ============ PROTECTED ROUTES (WITH AUTH MIDDLEWARE) ============
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
 		{
@@ -70,7 +72,7 @@ func SetupRoutes(router *gin.Engine) {
 				dashboard.POST("", handlers.CreateTransaction)
 			}
 
-			// Transactions
+			// Transactions (detailed operations)
 			transactions := protected.Group("/transactions")
 			{
 				transactions.GET("/:id", handlers.GetTransactionByID)
@@ -91,7 +93,7 @@ func SetupRoutes(router *gin.Engine) {
 				users.DELETE("/:id", handlers.DeleteUser)
 			}
 
-			// Funds: list for all, manage for admin
+			// Funds
 			funds := protected.Group("/funds")
 			{
 				funds.GET("", handlers.GetFunds)
