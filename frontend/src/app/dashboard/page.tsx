@@ -11,7 +11,14 @@ import {
 import { BarChart } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import api, { publicApi } from "@/lib/api";
-import { ArrowUpCircle, ArrowDownCircle, Wallet, Clock, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Wallet,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
 // Format untuk grafik (tanpa Rp)
 const formatChartValue = (value: number) => {
@@ -57,12 +64,13 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, monthlyRes, expenseCategoryRes, incomeCategoryRes] = await Promise.all([
-        publicApi.get("/dashboard/stats"),
-        publicApi.get("/dashboard/monthly"),
-        publicApi.get("/dashboard/category?type=expense&period=month"),
-        publicApi.get("/dashboard/category?type=income&period=all"),
-      ]);
+      const [statsRes, monthlyRes, expenseCategoryRes, incomeCategoryRes] =
+        await Promise.all([
+          publicApi.get("/dashboard/stats"),
+          publicApi.get("/dashboard/monthly"),
+          publicApi.get("/dashboard/category?type=expense&period=month"),
+          publicApi.get("/dashboard/category?type=income&period=all"),
+        ]);
 
       console.log("Income category response:", incomeCategoryRes.data);
       console.log("Expense category response:", expenseCategoryRes.data);
@@ -73,10 +81,16 @@ export default function DashboardPage() {
       if (monthlyRes.data.data && monthlyRes.data.data.length > 0) {
         setMonthlyData(monthlyRes.data.data);
       }
-      if (expenseCategoryRes.data.data && expenseCategoryRes.data.data.length > 0) {
+      if (
+        expenseCategoryRes.data.data &&
+        expenseCategoryRes.data.data.length > 0
+      ) {
         setCategoryDataExpense(expenseCategoryRes.data.data);
       }
-      if (incomeCategoryRes.data.data && incomeCategoryRes.data.data.length > 0) {
+      if (
+        incomeCategoryRes.data.data &&
+        incomeCategoryRes.data.data.length > 0
+      ) {
         setCategoryDataIncome(incomeCategoryRes.data.data);
       }
     } catch (error) {
@@ -187,20 +201,32 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-bold">Pemasukan vs Pengeluaran Bulanan</CardTitle>
+            <CardTitle className="text-lg font-bold">
+              Pemasukan vs Pengeluaran Bulanan
+            </CardTitle>
             <CardDescription>6 bulan terakhir</CardDescription>
           </CardHeader>
           <CardContent>
             <BarChart
-              data={monthlyData.map(item => ({
+              data={monthlyData.map((item) => ({
                 month: item.month,
                 income: item.income,
                 expense: item.expense,
               }))}
               xKey="month"
               bars={[
-                { dataKey: "income", fill: "#10b981", name: "Pemasukan", formatter: (value: number) => formatCurrency(value) },
-                { dataKey: "expense", fill: "#ef4444", name: "Pengeluaran", formatter: (value: number) => formatCurrency(value) },
+                {
+                  dataKey: "income",
+                  fill: "#10b981",
+                  name: "Pemasukan",
+                  formatter: (value: number) => formatCurrency(value),
+                },
+                {
+                  dataKey: "expense",
+                  fill: "#ef4444",
+                  name: "Pengeluaran",
+                  formatter: (value: number) => formatCurrency(value),
+                },
               ]}
             />
           </CardContent>
@@ -208,7 +234,9 @@ export default function DashboardPage() {
 
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-bold">Pengeluaran per Kategori</CardTitle>
+            <CardTitle className="text-lg font-bold">
+              Pengeluaran per Kategori
+            </CardTitle>
             <CardDescription>Bulan ini</CardDescription>
           </CardHeader>
           <CardContent>
@@ -216,7 +244,9 @@ export default function DashboardPage() {
               {categoryDataExpense.map((item: any, index: number) => (
                 <div key={index} className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-gray-700">{item.category}</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      {item.category}
+                    </span>
                     <span className="inline-block bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-bold">
                       {item.percentage}%
                     </span>
@@ -240,15 +270,22 @@ export default function DashboardPage() {
       {/* Income by Category */}
       <Card className="border-0 shadow-md">
         <CardHeader>
-          <CardTitle className="text-lg font-bold">Pemasukan per Kategori</CardTitle>
+          <CardTitle className="text-lg font-bold">
+            Pemasukan per Kategori
+          </CardTitle>
           <CardDescription>Semua waktu</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {categoryDataIncome.map((item: any, index: number) => (
-              <div key={index} className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+              <div
+                key={index}
+                className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200"
+              >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-gray-700">{item.category}</span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {item.category}
+                  </span>
                   <span className="inline-block bg-green-200 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-bold">
                     {item.percentage}%
                   </span>
@@ -270,4 +307,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

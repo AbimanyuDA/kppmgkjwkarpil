@@ -14,12 +14,14 @@ export function useRouteProtection() {
     }
 
     const user = JSON.parse(userData);
-    
+
     // Guest role - hanya bisa akses dashboard dan reports
     if (user.role === "guest") {
       const allowedPaths = ["/dashboard", "/dashboard/reports"];
-      const isAllowed = allowedPaths.some(path => pathname === path || pathname.startsWith(path + "/"));
-      
+      const isAllowed = allowedPaths.some(
+        (path) => pathname === path || pathname.startsWith(path + "/")
+      );
+
       if (!isAllowed) {
         setIsAuthorized(false);
         router.push("/dashboard");

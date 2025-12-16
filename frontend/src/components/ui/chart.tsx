@@ -15,7 +15,12 @@ import {
 interface BarChartProps {
   data: any[];
   xKey: string;
-  bars: { dataKey: string; fill: string; name: string; formatter?: (value: number) => string }[];
+  bars: {
+    dataKey: string;
+    fill: string;
+    name: string;
+    formatter?: (value: number) => string;
+  }[];
 }
 
 export function BarChart({ data, xKey, bars }: BarChartProps) {
@@ -25,8 +30,10 @@ export function BarChart({ data, xKey, bars }: BarChartProps) {
       return (
         <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
           {payload.map((entry: any, index: number) => {
-            const bar = bars.find(b => b.dataKey === entry.dataKey);
-            const formattedValue = bar?.formatter ? bar.formatter(entry.value) : entry.value;
+            const bar = bars.find((b) => b.dataKey === entry.dataKey);
+            const formattedValue = bar?.formatter
+              ? bar.formatter(entry.value)
+              : entry.value;
             return (
               <p key={index} style={{ color: entry.fill }}>
                 {entry.name}: {formattedValue}

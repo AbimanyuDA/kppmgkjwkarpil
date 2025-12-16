@@ -27,37 +27,27 @@ func SetupRoutes(router *gin.Engine) {
 
 	api := router.Group("/api")
 	{
-		// Public routes
+		// Public routes - Auth endpoints
 		auth := api.Group("/auth")
 		{
 			auth.POST("/login", handlers.Login)
 			auth.POST("/register", handlers.Register)
 		}
 
-		// Public endpoints - accessible without auth
-		public := api.Group("")
+		// Public endpoints - NO middleware
+		api.GET("/dashboard/stats", handlers.GetDashboardStats)
+		api.GET("/dashboard/monthly", handlers.GetMonthlyData)
+		api.GET("/dashboard/category", handlers.GetCategoryData)
+		api.GET("/transactions", handlers.GetTransactions)
+		
+		reports := api.Group("/reports")
 		{
-			// Dashboard stats - public access
-			dashboard := public.Group("/dashboard")
-			{
-				dashboard.GET("/stats", handlers.GetDashboardStats)
-				dashboard.GET("/monthly", handlers.GetMonthlyData)
-				dashboard.GET("/category", handlers.GetCategoryData)
-			}
-
-			// Transactions - public access
-			public.GET("/transactions", handlers.GetTransactions)
-
-			// Reports - public access
-			reports := public.Group("/reports")
-			{
-				reports.GET("", handlers.GetReports)
-				reports.GET("/export/pdf", handlers.ExportPDF)
-				reports.GET("/export/excel", handlers.ExportExcel)
-			}
+			reports.GET("", handlers.GetReports)
+			reports.GET("/export/pdf", handlers.ExportPDF)
+			reports.GET("/export/excel", handlers.ExportExcel)
 		}
 
-		// Protected routes
+		// Protected routes - WITH middleware
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
 		{
@@ -74,10 +64,10 @@ func SetupRoutes(router *gin.Engine) {
 				}
 			}
 
-			// Dashboard
+			// Dashboard POST (create transactions)
 			dashboard := protected.Group("/dashboard")
 			{
-				dashboard.POST("", handlers.CreateTransaction) // Keep POST for protected, GET is public
+				dashboard.POST("", handlers.CreateTransaction)
 			}
 
 			// Transactions
@@ -100,7 +90,6 @@ func SetupRoutes(router *gin.Engine) {
 				users.PUT("/:id", handlers.UpdateUser)
 				users.DELETE("/:id", handlers.DeleteUser)
 			}
-
 
 			// Funds: list for all, manage for admin
 			funds := protected.Group("/funds")

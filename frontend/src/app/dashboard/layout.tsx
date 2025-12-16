@@ -43,16 +43,36 @@ export default function DashboardLayout({ children }: SidebarProps) {
 
   const menuItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard", guestOnly: false },
-    { href: "/dashboard/transactions", icon: FileText, label: "Transaksi", adminOnly: true },
-    { href: "/dashboard/income", icon: DollarSign, label: "Input Pemasukan", adminOnly: true },
-    { href: "/dashboard/upload", icon: Upload, label: "Input Pengeluaran", adminOnly: true },
+    {
+      href: "/dashboard/transactions",
+      icon: FileText,
+      label: "Transaksi",
+      adminOnly: true,
+    },
+    {
+      href: "/dashboard/income",
+      icon: DollarSign,
+      label: "Input Pemasukan",
+      adminOnly: true,
+    },
+    {
+      href: "/dashboard/upload",
+      icon: Upload,
+      label: "Input Pengeluaran",
+      adminOnly: true,
+    },
     {
       href: "/dashboard/transfer",
       icon: ArrowLeftRight,
       label: "Transfer Saldo",
       adminOnly: true,
     },
-    { href: "/dashboard/reports", icon: FileText, label: "Laporan", guestOnly: false },
+    {
+      href: "/dashboard/reports",
+      icon: FileText,
+      label: "Laporan",
+      guestOnly: false,
+    },
     {
       href: "/dashboard/categories",
       icon: Folder,
