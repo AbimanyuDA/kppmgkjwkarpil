@@ -25,95 +25,97 @@ func SetupRoutes(router *gin.Engine) {
 		c.String(200, "OK")
 	})
 
-	api := router.Group("/api")
+	// ==================== PUBLIC ROUTES (NO AUTH REQUIRED) ====================
+	// Auth endpoints
+	auth := router.Group("/api/auth")
 	{
-		// ============ PUBLIC ROUTES (NO MIDDLEWARE) ============
-		
-		// Auth endpoints
-		auth := api.Group("/auth")
+		auth.POST("/login", handlers.Login)
+		auth.POST("/register", handlers.Register)
+	}
+
+	// Public Dashboard endpoints
+	dashboard := router.Group("/api/dashboard")
+	{
+		dashboard.GET("/stats", handlers.GetDashboardStats)
+		dashboard.GET("/monthly", handlers.GetMonthlyData)
+		dashboard.GET("/category", handlers.GetCategoryData)
+	}
+
+	// Public Transactions endpoint (GET only)
+	router.GET("/api/transactions", handlers.GetTransactions)
+
+	// Public Reports endpoints
+	reports := router.Group("/api/reports")
+	{
+		reports.GET("", handlers.GetReports)
+		reports.GET("/export/pdf", handlers.ExportPDF)
+		reports.GET("/export/excel", handlers.ExportExcel)
+	}
+
+	// ==================== PROTECTED ROUTES (AUTH REQUIRED) ====================
+	api := router.Group("/api")
+	api.Use(middleware.AuthMiddleware())
+	{
+		// Categories (protected)
+		categories := api.Group("/categories")
 		{
-			auth.POST("/login", handlers.Login)
-			auth.POST("/register", handlers.Register)
+			categories.GET("", handlers.GetCategories)
+			adminCategories := categories.Group("")
+			adminCategories.Use(middleware.AdminOnly())
+			{
+				adminCategories.POST("", handlers.CreateCategory)
+				adminCategories.PUT(":id", handlers.UpdateCategory)
+				adminCategories.DELETE(":id", handlers.DeleteCategory)
+			}
 		}
 
-		// Public dashboard endpoints
-		api.GET("/dashboard/stats", handlers.GetDashboardStats)
-		api.GET("/dashboard/monthly", handlers.GetMonthlyData)
-		api.GET("/dashboard/category", handlers.GetCategoryData)
-		
-		// Public transaction list
-		api.GET("/transactions", handlers.GetTransactions)
-		
-		// Public reports
-		api.GET("/reports", handlers.GetReports)
-		api.GET("/reports/export/pdf", handlers.ExportPDF)
-		api.GET("/reports/export/excel", handlers.ExportExcel)
-
-		// ============ PROTECTED ROUTES (WITH AUTH MIDDLEWARE) ============
-		protected := api.Group("")
-		protected.Use(middleware.AuthMiddleware())
+		// Dashboard POST (create transactions - protected)
+		dashboardProtected := api.Group("/dashboard")
 		{
-			// Categories
-			categories := protected.Group("/categories")
-			{
-				categories.GET("", handlers.GetCategories)
-				adminCategories := categories.Group("")
-				adminCategories.Use(middleware.AdminOnly())
-				{
-					adminCategories.POST("", handlers.CreateCategory)
-					adminCategories.PUT(":id", handlers.UpdateCategory)
-					adminCategories.DELETE(":id", handlers.DeleteCategory)
-				}
-			}
-
-			// Dashboard POST (create transactions)
-			dashboard := protected.Group("/dashboard")
-			{
-				dashboard.POST("", handlers.CreateTransaction)
-			}
-
-			// Transactions (detailed operations)
-			transactions := protected.Group("/transactions")
-			{
-				transactions.GET("/:id", handlers.GetTransactionByID)
-				transactions.POST("", handlers.CreateTransaction)
-				transactions.PUT("/:id", handlers.UpdateTransaction)
-				transactions.PUT("/:id/status", handlers.UpdateTransactionStatus)
-				transactions.DELETE("/:id", middleware.AdminOnly(), handlers.DeleteTransaction)
-			}
-
-			// Users (Admin only)
-			users := protected.Group("/users")
-			users.Use(middleware.AdminOnly())
-			{
-				users.GET("", handlers.GetUsers)
-				users.GET("/:id", handlers.GetUserByID)
-				users.POST("", handlers.CreateUser)
-				users.PUT("/:id", handlers.UpdateUser)
-				users.DELETE("/:id", handlers.DeleteUser)
-			}
-
-			// Funds
-			funds := protected.Group("/funds")
-			{
-				funds.GET("", handlers.GetFunds)
-				fundsAdmin := funds.Group("")
-				fundsAdmin.Use(middleware.AdminOnly())
-				{
-					fundsAdmin.POST("", handlers.CreateFund)
-					fundsAdmin.PUT("/:id", handlers.UpdateFund)
-					fundsAdmin.DELETE("/:id", handlers.DeleteFund)
-				}
-			}
-
-			// Activity Logs
-			logs := protected.Group("/logs")
-			{
-				logs.GET("", middleware.AdminOnly(), handlers.GetActivityLogs)
-			}
-
-			// File Upload
-			protected.POST("/upload", handlers.UploadFile)
+			dashboardProtected.POST("", handlers.CreateTransaction)
 		}
+
+		// Transactions (protected operations)
+		transactions := api.Group("/transactions")
+		{
+			transactions.GET("/:id", handlers.GetTransactionByID)
+			transactions.POST("", handlers.CreateTransaction)
+			transactions.PUT("/:id", handlers.UpdateTransaction)
+			transactions.PUT("/:id/status", handlers.UpdateTransactionStatus)
+			transactions.DELETE("/:id", middleware.AdminOnly(), handlers.DeleteTransaction)
+		}
+
+		// Users (Admin only)
+		users := api.Group("/users")
+		users.Use(middleware.AdminOnly())
+		{
+			users.GET("", handlers.GetUsers)
+			users.GET("/:id", handlers.GetUserByID)
+			users.POST("", handlers.CreateUser)
+			users.PUT("/:id", handlers.UpdateUser)
+			users.DELETE("/:id", handlers.DeleteUser)
+		}
+
+		// Funds (protected)
+		funds := api.Group("/funds")
+		{
+			funds.GET("", handlers.GetFunds)
+			fundsAdmin := funds.Group("")
+			fundsAdmin.Use(middleware.AdminOnly())
+			{
+				fundsAdmin.POST("", handlers.CreateFund)
+				fundsAdmin.PUT("/:id", handlers.UpdateFund)
+				fundsAdmin.DELETE("/:id", handlers.DeleteFund)
+			}
+		}
+
+		// Activity Logs (Admin only)
+		logs := api.Group("/logs")
+		{
+			logs.GET("", middleware.AdminOnly(), handlers.GetActivityLogs)
+		}
+
+		// File Upload (protected)
+		api.POST("/upload", handlers.UploadFile)
 	}
 }
