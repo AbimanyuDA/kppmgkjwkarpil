@@ -203,7 +203,6 @@ export default function DashboardPage() {
                 { dataKey: "expense", fill: "#ef4444", name: "Pengeluaran", formatter: (value: number) => formatCurrency(value) },
               ]}
             />
-            />
           </CardContent>
         </Card>
 
