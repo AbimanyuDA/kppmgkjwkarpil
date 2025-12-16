@@ -15,9 +15,9 @@ export function useRouteProtection() {
 
     const user = JSON.parse(userData);
 
-    // Guest role - hanya bisa akses dashboard dan reports
+    // Guest role - hanya bisa akses dashboard, transactions, dan reports (read-only)
     if (user.role === "guest") {
-      const allowedPaths = ["/dashboard", "/dashboard/reports"];
+      const allowedPaths = ["/dashboard", "/dashboard/transactions", "/dashboard/reports"];
       const isAllowed = allowedPaths.some(
         (path) => pathname === path || pathname.startsWith(path + "/")
       );

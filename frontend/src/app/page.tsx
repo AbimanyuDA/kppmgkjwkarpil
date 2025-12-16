@@ -128,15 +128,9 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/login")}
-                  className="text-white hover:bg-white/10"
-                >
-                  Login
-                </Button>
-                <Button
-                  onClick={() => router.push("/register")}
                   className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0"
                 >
-                  Daftar
+                  Login
                 </Button>
               </>
             )}

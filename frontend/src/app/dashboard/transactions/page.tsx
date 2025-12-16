@@ -220,14 +220,16 @@ export default function TransactionsPage() {
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditModal(transaction)}
-                        title="Edit transaksi"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
+                      {user?.role !== "guest" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditModal(transaction)}
+                          title="Edit transaksi"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
                       {user?.role === "admin" &&
                         transaction.status === "pending" && (
                           <>
