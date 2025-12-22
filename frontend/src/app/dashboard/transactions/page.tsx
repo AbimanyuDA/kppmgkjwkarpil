@@ -46,6 +46,7 @@ export default function TransactionsPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [user, setUser] = useState<any>(null);
   const [funds, setFunds] = useState<any[]>([]);
+  const [filterPending, setFilterPending] = useState(true);
   const [editFormData, setEditFormData] = useState<any>({
     amount: "",
     category: "",
@@ -59,7 +60,9 @@ export default function TransactionsPage() {
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      console.log("User data:", parsedUser); // Debug: lihat role user
     }
     fetchTransactions();
     fetchFunds();
@@ -77,7 +80,12 @@ export default function TransactionsPage() {
   const fetchTransactions = async () => {
     try {
       const response = await api.get("/transactions");
-      setTransactions(response.data.data);
+      const allTransactions = response.data.data;
+      console.log("All transactions from API:", allTransactions); // Debug
+      allTransactions?.forEach((tx: any) => {
+        console.log(`Transaction: ${tx.eventName}, Status: ${tx.status}`); // Debug setiap transaksi
+      });
+      setTransactions(allTransactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
@@ -164,6 +172,11 @@ export default function TransactionsPage() {
     );
   };
 
+  // Filter transaksi berdasarkan status jika admin
+  const filteredTransactions = filterPending && user?.role === "admin" 
+    ? transactions.filter((tx) => tx.status === "pending")
+    : transactions;
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -179,7 +192,18 @@ export default function TransactionsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Semua Transaksi</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Semua Transaksi</CardTitle>
+            {user?.role === "admin" && (
+              <Button
+                variant={filterPending ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterPending(!filterPending)}
+              >
+                {filterPending ? `⏳ Pending (${transactions.filter(t => t.status === "pending").length})` : "📋 Semua"}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -196,7 +220,7 @@ export default function TransactionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
+              {filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
                   <TableCell>{formatDate(transaction.date)}</TableCell>
                   <TableCell>{getTypeBadge(transaction.type)}</TableCell>

@@ -41,9 +41,6 @@ func SetupRoutes(router *gin.Engine) {
 		dashboard.GET("/category", handlers.GetCategoryData)
 	}
 
-	// Public Transactions endpoint (GET only - approved transactions)
-	router.GET("/api/transactions", handlers.GetApprovedTransactions)
-
 	// Public Categories endpoint (GET only - for form dropdowns)
 	router.GET("/api/categories", handlers.GetCategories)
 
@@ -83,6 +80,7 @@ func SetupRoutes(router *gin.Engine) {
 		// Transactions (protected operations)
 		transactions := api.Group("/transactions")
 		{
+			transactions.GET("", handlers.GetTransactions)
 			transactions.GET("/:id", handlers.GetTransactionByID)
 			transactions.POST("", handlers.CreateTransaction)
 			transactions.PUT("/:id", handlers.UpdateTransaction)
